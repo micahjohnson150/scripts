@@ -58,7 +58,10 @@ print("\nAdding variables to {0}...".format(f_out))
 for name,var in snow_img.variables.items():
 
     if name.lower() in ['x','y','time','swi']:
-        out.createVariable(name, var.datatype, var.dimensions)
+        if name.lower() != 'swi':
+            out.createVariable(name, var.datatype, var.dimensions)
+        else:
+            out.createVariable(name, 'float64', var.dimensions)
 
         print("\t{0}".format(name))
 
@@ -72,12 +75,17 @@ for name,var in snow_img.variables.items():
             out[name][:] = snow_img.variables[name][:]
 
         elif name.lower() == 'swi':
-            masked_data = snow_img.variables[name]*mask
+            masked_data = snow_img.variables[name][:]*mask
+            masked_data[:,mask==False] = -9999
+
             out[name][:] = np.flipud(masked_data[:,miny:maxy,minx:maxx])
 
 print("Adding Dem...")
 out.createVariable('dem', 'float64', img.variables['dem'].dimensions)
-out['dem'][:] = (img.variables['dem'][:]*mask)[miny:maxy,minx:maxx]
+dem_data = img.variables['dem']*mask
+dem_data[mask==False] = -9999
+
+out['dem'][:] = dem_data[miny:maxy,minx:maxx]
 
 out.sync()
 img.close()
