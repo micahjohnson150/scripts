@@ -10,10 +10,23 @@ import numpy as np
 import progressbar as pb
 import matplotlib.pyplot as plt
 import pandas as pd
+import argparse
+
+parser = argparse.ArgumentParser(description="Run Land labs overland flow model")
+parser.add_argument(dest='swi',
+                    help='Path to a netcdf file that has swi and dem in it.')
+
+parser.add_argument('--output','-o', default= './surface_water.nc',
+                                    help='output filename')
+parser.add_argument('--days','-d', default='max days',
+                                   help='number of days to run')
+
+
+args = parser.parse_args()
 
 ################################# INPUTS #######################################
-days = 21 #"max_days"
-swi_f = './swi.nc'
+days = args.days
+swi_f = args.swi
 
 ################################# SETUP ########################################
 
@@ -21,7 +34,7 @@ swi_f = './swi.nc'
 swi_ds = Dataset(swi_f, mode ='r')
 
 # Make output netcdfs
-out = Dataset('surface_water.nc', mode = 'w',format='NETCDF4')
+out = Dataset(args.output, mode = 'w',format='NETCDF4')
 
 # Add NC dimensions
 for d,dimension in swi_ds.dimensions.items():
@@ -48,8 +61,10 @@ z = dem
 
 # Calculate run time
 elapsed_time = 0.0
-if days == 'max_days':
+if days == 'max days':
     days = len(pp[:,0,0])
+else:
+    days = int(days)
 
 model_run_time = 86400*days
 
@@ -94,8 +109,7 @@ write_netcdf('ll_topo.nc', rmg, names=['topographic__elevation'])
 print()
 bar = pb.ProgressBar(max_value= (model_run_time/3600)+1)
 
-
-pp_t = 87
+pp_t = 0
 iteration = 0
 precip = ((pp[pp_t,:]/86400.0)/1000.0).flatten()
 

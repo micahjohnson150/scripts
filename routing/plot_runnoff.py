@@ -2,17 +2,27 @@ from netCDF4 import Dataset
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import argparse
 
-# Read actuall runnoff
-df = pd.read_csv('./reynolds-creek-116b-hourly-streamflow.dat',parse_dates=True,
-                                                               index_col=0,
-                                                               header=17)
+parser = argparse.ArgumentParser(description="Plot up the runoff")
+parser.add_argument(dest='surface_water',
+                    help='Path to a netcdf file that has surface_water discharge')
+parser.add_argument(dest='runoff', help='Path to measured runoff')
+
+parser.add_argument(dest='swi',
+                    help='Path to a netcdf file that has swi')
+
+args = parser.parse_args()
+
+# Read actual runnoff
+df = pd.read_csv(args.runoff,parse_dates=True, index_col=0, header=17)
+
 # Open our modeled
-ds  = Dataset('./surface_water.nc')
+ds  = Dataset(args.surface_water)
 array_shape = ds.variables['surface_water__discharge'][0,:].shape
 
 # Look with our modeled swi
-swi_ds  = Dataset('./swi.nc')
+swi_ds  = Dataset(args.swi)
 
 swi = []
 for t in range(int(len(ds.variables['surface_water__discharge'])/24)):

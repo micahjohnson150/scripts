@@ -2,12 +2,24 @@ import netCDF4 as nc
 import datetime as dt
 import numpy as np
 import matplotlib.pyplot as plt
+import argparse
 
+parser = argparse.ArgumentParser(description="Crop a dem and associated data to"
+                                            "a sub mask")
+parser.add_argument(dest='topo',
+                    help='Path to a netcdf file that has dem and the mask in it')
 
-input_f = './topo_50m_copy.nc'
-snow_f = './em.nc'
-f_out = './swi.nc'
+parser.add_argument(dest='em', help='Path to a netcdf file that has swi')
 
+parser.add_argument('--output','-o', default= './out.nc', help='output filename')
+parser.add_argument('--mask','-m', default= 'mask tollgate', help='mask name to use')
+
+args = parser.parse_args()
+
+input_f = args.topo
+snow_f = args.em
+f_out = args.output
+mask = args.mask
 
 print("\nCreating output file...")
 
@@ -19,12 +31,12 @@ snow_img = nc.Dataset(snow_f)
 
 out = nc.Dataset(f_out, mode = 'w', format='NETCDF4')
 
-out.description =' Cropped to tollgate.'
+out.description =' Cropped to {}.'.format(mask)
 
 out.history = " Modified {0}".format(
                         (dt.datetime.now().strftime("%y-%m-%d %H:%M")))
 # get the exents
-mask = img.variables['mask tollgate'][:]
+mask = img.variables[mask][:]
 ln = np.where(mask)
 minx = np.min(ln[1])
 maxx = np.max(ln[1])
