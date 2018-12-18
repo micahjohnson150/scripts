@@ -85,7 +85,13 @@ def create(cat, path, workspace, store=None, layer=None):
         store: name of the data store
         layer: name of the layer
     """
-    if store != None and layer == None:
+
+    if store == None and layer == None:
+        obj = 'Workspace'
+        name = workspace
+        workspace = "GeoServer"
+
+    elif store != None and layer == None:
         obj = 'Datastore'
         name = store
 
@@ -99,11 +105,21 @@ def create(cat, path, workspace, store=None, layer=None):
 
     msg = ("{} {} does not exist in the {},\n Do you want to create it?"
                                                 "".format(obj, name, workspace))
+    if workspace == "GeorServer":
+        workspace = name
+
     response = ask_user(msg)
 
     if response == True:
 
         print("Creating new {} named {} in {}".format(obj, name, workspace))
+
+        # New workspace
+        if obj.lower() == 'workspace':
+            gs_obj = cat.create_workspace(name,uri= name.replace(' ','_'))
+            gs_obj.enabled = True
+            gs_obj.save()
+
         # Datastores for hold netcdf
         if obj.lower() == 'datastore':
             gs_obj = cat.create_coveragestore(name, path=path,
@@ -111,7 +127,7 @@ def create(cat, path, workspace, store=None, layer=None):
                                                     type='NetCDF',
                                                     create_layer=False)
         # WMS Layer
-        elif obj.lower() == 'layer':
+        if obj.lower() == 'layer':
             gs_obj = cat.create_wmslayer(workspace, store, layer)
 
 
@@ -133,6 +149,9 @@ def publish_data(cat, path, basin):
     """
     name = 'test'
     workspace = basin
+    if not exists(cat, basin, type='workspace'):
+        print("Checking if basin {} exists...".format(workspace))
+        gs_obj = create(cat, path, basin)
 
     print("Checking if datastore {} in {} exists...".format(name,workspace))
     if exists(cat, name, type='store'):
@@ -171,7 +190,7 @@ def main():
 
 
     cat = gsconnect(args.credentials)
-    publish_data(cat,args.netcdf,args.basin)
+    publish_data(cat, args.netcdf, args.basin)
 
 
 if __name__ =='__main__':
