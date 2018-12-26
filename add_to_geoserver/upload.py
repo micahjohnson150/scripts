@@ -1,58 +1,139 @@
 import json
-from geoserver.catalog import Catalog
 import argparse
 import sys
+import requests
+from urllib.parse import urljoin
 
 
-def gsconnect(cred_json):
-    """
-    Returns a geoserver Catalog
+class AWSM_Geoserver(object):
+    def __init__(self, fname):
 
-    Args:
-        cred_json: protected JSON file containing url,username,password for the
-                   geoserver
-    """
-    with open(cred_json) as fp:
-        cred = json.load(fp)
-        fp.close()
+        with open(fname) as fp:
+            cred = json.load(fp)
+            fp.close()
 
-    cat = Catalog(cred['url'], cred[ "username"], cred['password'])
+        self.password = cred['password']
+        self.username = cred['username']
+        self.url = cred['url']
+        headers = {'content-type': 'json'}
+        self.credential = (self.username, self.password)
 
-    return cat
+    def make(self, resource, payload):
+        headers = {'content-type' : 'application/json'}
+        request_url = urljoin(self.url, resource)
+
+        r = requests.post(
+            request_url,
+            headers=headers,
+            data=json.dumps(payload),
+            auth=self.credential
+        )
+        return r.raise_for_status()
+
+    def get(self, resource):
+
+        headers = {'Accept' : 'application/json'}
+        request_url = urljoin(self.url, resource)
+
+        r = requests.get(
+            request_url,
+            headers=headers,
+            auth=self.credential
+        )
+
+        return r.json()
+
+    def exists(self, basin, store=None, layer=None, upload_type='modeled'):
+        """
+        Checks the geoserver if the object type by name already exists
+
+        Args:
+
+        """
+
+        ws_exists = False # Does the workspace exist
+        store_exists = False # Does the workspace > datastore exist
+        lyr_exists = False # Does the workspace > datastore > layer exist
+
+        rjson = self.get('workspaces')
+        workspaces_info = rjson
+
+        # Check if the basin exists as a workspace
+        for w in workspaces_info['workspaces']['workspace']:
+            if basin.lower() == w['name']:
+                ws_exists = True
+
+                if store != None:
+                    # Grab info about this existing workspace
+                    ws_dict = self.get(w['href'])
+
+                if upload_type != 'shapefile':
+                    # Grab info on rasters
+                    cs_dict = self.get(ws_dict['workspace']['coverageStores'])
+
+                    # Check for matching name in the coverages
+                    for cs in cs_dict['coverageStores']['coverageStore']:
+                        if store == cs['name']:
+                            store_exists = True
+
+                            # Grab info about this existing coverage store
+                            lyr_dict = self.get(cs['href'])
+
+                            break
+                else:
+                    # Grab info on datastores
+                    ds_dict = self.get(ws_dict['workspace']['dataStores'])
+
+                    # Check for matching name in the dataStores
+                    for ds in ds_dict['dataStores']['dataStore']:
+                        if store == ds['name']:
+                            store_exists = True
+
+                            # Grab info about this existing shapfiles store
+                            lyr_dict = self.get(ds['href'])
+                            break
+
+                break
+
+    def create(self, basin, store=None, layer=None):
+        """
+        Handles creating all the necessary stuff in the geoserver
+        """
+
+        if not self.exists(basin):
+            create_ws = ask_user("You are about to create a new basin on the geoserver called:"
+                     " {}\n Are you sure you want to continue?".format(basin))
+            if not create_ws:
+                print("Aborting creating a new basin. Exiting...")
+                sys.exit()
+            else:
+                print("Creating a new basin on geoserver...")
+                payload = {'workspace': {'name':basin}}
+
+                rjson = self.make('workspaces', payload)
+
+    def upload(self, basin, filename, upload_type='modeled'):
+        """
+        Generic upload function to redirect to specific uploading
+        """
+        if upload_type == 'topo':
+            self.upload_topo(basin, filename)
+
+        elif upload_type == 'flight':
+            pass
+        elif upload_type == 'modeled':
+            pass
+        elif upload_type == 'shapefile':
+            pass
+        else:
+            raise ValueError("Invalid upload type!")
 
 
-def upload(fname):
-    """
-    Upload a netcdf to the user on the instance, then move it to our data drive
+    def upload_topo(self, basin, filename):
+        store_name = "{}_topo".format(basin)
 
-    Args:
-        fname: path to a file to move
-    """
-    pass
-
-
-def exists(cat, name, type):
-    """
-    Checks the geoserver if the object type by name already exists
-
-    Args:
-        name: name of object
-        cat: catalog instance from the geoserver
-        type: must be workspace, store, layer
-    """
-    if type == 'workspace':
-        names = [w.name for w in cat.get_workspaces()]
-    elif type == 'store':
-        names = [s.name for s in cat.get_stores()]
-    elif type == 'layer':
-        names = [w.name for w in cat.get_workspaces()]
-    else:
-        raise ValueError("Invalid entry for type, must be workspace, store, layer")
-
-    if name in names:
-        return True
-    else:
-        return False
+        if not self.exists(basin, store=store_name):
+            self.create(basin, store=store_name)
 
 def ask_user(msg):
     """
@@ -74,106 +155,16 @@ def ask_user(msg):
     return response
 
 
-def create(cat, path, workspace, store=None, layer=None):
-    """
-    Prompts user to create a new workspace, store or layer if they do not exists.
-
-    Args:
-        cat: Geoserver catalog object
-        workspace: name of the workspace also basin name
-        path: Path to file to be uploaded
-        store: name of the data store
-        layer: name of the layer
-    """
-
-    if store == None and layer == None:
-        obj = 'Workspace'
-        name = workspace
-        workspace = "GeoServer"
-
-    elif store != None and layer == None:
-        obj = 'Datastore'
-        name = store
-
-    elif store != None and layer != None:
-        obj = 'Layer'
-        name = layer
-
-    else:
-        print("You must use store with layer.")
-        sys.exit()
-
-    msg = ("{} {} does not exist in the {},\n Do you want to create it?"
-                                                "".format(obj, name, workspace))
-    if workspace == "GeorServer":
-        workspace = name
-
-    response = ask_user(msg)
-
-    if response == True:
-
-        print("Creating new {} named {} in {}".format(obj, name, workspace))
-
-        # New workspace
-        if obj.lower() == 'workspace':
-            gs_obj = cat.create_workspace(name,uri= name.replace(' ','_'))
-            gs_obj.enabled = True
-            gs_obj.save()
-
-        # Datastores for hold netcdf
-        if obj.lower() == 'datastore':
-            gs_obj = cat.create_coveragestore(name, path=path,
-                                                    workspace=workspace,
-                                                    type='NetCDF',
-                                                    create_layer=False)
-        # WMS Layer
-        if obj.lower() == 'layer':
-            gs_obj = cat.create_wmslayer(workspace, store, layer)
-
-
-    else:
-        print("Not creating anything, exiting...")
-        sys.exit()
-
-    return gs_obj
-
-
-def publish_data(cat, path, basin):
-    """
-    Finalizes and publishes the data on to the geoserver. The file must be on the
-    instance already in the data folder that the geoserver sees. The filename
-    must be the path to the file on the server instance, not the local.
-
-    Args:
-        server_fname: Server side path to the data to add
-    """
-    name = 'test'
-    workspace = basin
-    if not exists(cat, basin, type='workspace'):
-        print("Checking if basin {} exists...".format(workspace))
-        gs_obj = create(cat, path, basin)
-
-    print("Checking if datastore {} in {} exists...".format(name,workspace))
-    if exists(cat, name, type='store'):
-        print("Datastore {} already exists, use a different datastore name"
-                                                                "".format(name))
-        sys.exit()
-
-    else:
-        gs_obj = create(cat, path, basin, store=name)
-
-
-
 def main():
     # Parge command line arguments
     p = argparse.ArgumentParser(description="Submits either a lidar flight,"
                                             " AWSM/SMRF topo image, or AWSM "
                                             " modeling results to a geoserver")
 
-    p.add_argument('-f','--netcdf', dest='netcdf',
+    p.add_argument('-f','--filename', dest='filename',
                     required=True,
-                    help="Path to a netcdf containing either a lidar flight,"
-                    "AWSM/SMRF topo image, or AWSM modeling results"
+                    help="Path to a file containing either a lidar flight,"
+                    "AWSM/SMRF topo image, or AWSM modeling results or shapefiles"
                     )
 
     p.add_argument('-b','--basin', dest='basin',
@@ -186,11 +177,17 @@ def main():
                     required=False,
                     help="JSON containing geoserver credentials for logging in")
 
+    p.add_argument('-t','--upload_type', dest='upload_type',
+                    default='modeled',
+                    choices=['flight','topo','shapefile','modeled'],
+                    required=False,
+                    help="Upload type dictates how some items are uploaded.")
+
     args = p.parse_args()
 
 
-    cat = gsconnect(args.credentials)
-    publish_data(cat, args.netcdf, args.basin)
+    gs = AWSM_Geoserver(args.credentials)
+    gs.upload(args.basin,args.filename, upload_type=args.upload_type)
 
 
 if __name__ =='__main__':
