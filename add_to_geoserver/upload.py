@@ -3,7 +3,8 @@ import argparse
 import sys
 import requests
 from urllib.parse import urljoin
-
+from shutil import copyfile
+import os
 
 class AWSM_Geoserver(object):
     def __init__(self, fname):
@@ -17,13 +18,19 @@ class AWSM_Geoserver(object):
         self.url = cred['url']
         self.credential = (self.username, self.password)
 
-    def pushnc(self, resource, filename):
+    def pushf(self, resource, filename):
+        """
+        Attaches file to the store
+
+        """
 
         headers = {"content-type": "application/zip",
                    "Accept": "application/json"}
 
         request_url = urljoin(self.url, resource)
+        request_url = urljoin(request_url,os.path.basename(filename))
 
+        print(self.url)
         with open(filename, 'rb') as f:
             r = requests.put(
                 request_url,
@@ -48,6 +55,20 @@ class AWSM_Geoserver(object):
 
         return r.raise_for_status()
 
+    def put(self, resource, payload):
+
+        headers = {'content-type' : 'application/json'}
+        request_url = urljoin(self.url, resource)
+
+        r = requests.put(
+            request_url,
+            headers=headers,
+            data=json.dumps(payload),
+            auth=self.credential
+        )
+
+        return r.raise_for_status()
+
     def get(self, resource):
         """
         Use for getting information from geoserver
@@ -62,6 +83,24 @@ class AWSM_Geoserver(object):
         )
         print(r)
         return r.json()
+
+    def copy_data(self, fname, basin):
+        """
+        Data for the geoserver has to be in the host location for this. We
+        working locally for now so we will create a mock function to move data
+        then upgrade to scp of sorts.
+
+        Copies data from users location to geoserver/data/<basin>/
+
+        """
+        bname =  os.path.basename(fname)
+        final_name = ('/home/micahjohnson/projects/nwrc_geoserver/data/{}/{}'
+                      ''.format(basin, bname))
+
+        print("Copying {} to geoserver {}".format(bname, final_name))
+        copyfile(os.path.abspath(fname), final_name)
+
+        return final_name
 
     def exists(self, basin, store=None, layer=None, upload_type='modeled'):
         """
@@ -143,10 +182,12 @@ class AWSM_Geoserver(object):
 
     def create_coveragestore(self, basin, store, filename, raster_type='topo'):
         """
+        Create a data store for raster data
         """
-
+        bname = os.path.basename(filename)
         if not self.exists(basin, store):
             if raster_type == 'topo':
+                print(filename)
                 store_name = "{}_topo".format(basin)
 
                 resource = 'workspaces/{}/coveragestores.json'.format(basin)
@@ -156,7 +197,8 @@ class AWSM_Geoserver(object):
                                             "enabled":True,
                                             "_default":False,
                                             "workspace":{"name":basin},
-                                            "url":"file:{}".format(filename)}}
+                                            "url":"file:{}/{}".format(basin,bname)}}
+                                            #"uri":basin.replace(" ","_")}}
 
             elif raster_type == 'modeled':
                 pass
@@ -172,32 +214,46 @@ class AWSM_Geoserver(object):
                 print("Creating a new datastore on geoserver...")
                 rjson = self.make(resource, payload)
                 print(rjson)
-                rjson = self.pushnc(resource, filename)
+                print("Attaching data to the new data store...")
+
+                #resource = '/workspaces/{}/coveragestores/{}.json]'.format(basin, store_name)
+                #rjson = self.pushf(resource, filename)
+                #print(rjson)
 
     def create_basin(self, basin):
         """
         Handles creating all the necessary stuff in the geoserver
         """
 
-        if not self.exists(basin):
-            create_ws = ask_user("You are about to create a new basin on the geoserver called:"
-                     " {}\n Are you sure you want to continue?".format(basin))
-            if not create_ws:
-                print("Aborting creating a new basin. Exiting...")
-                sys.exit()
-            else:
-                print("Creating a new basin on geoserver...")
-                payload = {'workspace': {'name':basin}}
+        create_ws = ask_user("You are about to create a new basin on the"
+                             " geoserver called: {}\n Are you sure you want"
+                             " to continue?".format(basin))
+        if not create_ws:
+            print("Aborting creating a new basin. Exiting...")
+            sys.exit()
 
-                rjson = self.make('workspaces', payload)
+        else:
+            print("Creating a new basin on geoserver...")
+            payload = {'workspace': {'name':basin},
+                        'uri':basin.replace(' ','_')}
 
+            rjson = self.make('workspaces', payload)
+            print(rjson)
 
     def upload(self, basin, filename, upload_type='modeled'):
         """
         Generic upload function to redirect to specific uploading
         """
+        # Ensure that this workspace exists
+        if not self.exists(basin):
+            self.create_basin(basin)
+
+        # Copy users data up to the remote location
+        remote_fname = self.copy_data(filename, basin)
+
+        # Check for the upload type which determines the filename, and store type
         if upload_type == 'topo':
-            self.upload_topo(basin, filename)
+            self.upload_topo(remote_fname, basin)
 
         elif upload_type == 'flight':
             pass
@@ -208,12 +264,22 @@ class AWSM_Geoserver(object):
         else:
             raise ValueError("Invalid upload type!")
 
-
-    def upload_topo(self, basin, filename):
+    def upload_topo(self, filename, basin):
+        """
+        Uploads the basins topo images which are static. These images include:
+        * dem
+        * basin mask
+        * subbasin masks
+        * vegetation images relating to types, albedo, and heights
+        """
+        # Always call store names the same thing, <basin>_topo
         store_name = "{}_topo".format(basin)
 
-        if not self.exists(basin, store=store_name):
-            self.create_coveragestore(basin, store_name, filename, raster_type='topo')
+        #if not self.exists(basin, store=store_name):
+        self.create_coveragestore(basin, store_name, filename, raster_type='topo')
+        #else:
+            #print("Data store {} already exists...".format(store_name))
+
 
 def ask_user(msg):
     """
