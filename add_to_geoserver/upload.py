@@ -5,6 +5,8 @@ import requests
 from urllib.parse import urljoin
 from shutil import copyfile
 import os
+from netCDF4 import Dataset
+
 
 class AWSM_Geoserver(object):
     def __init__(self, fname):
@@ -30,7 +32,6 @@ class AWSM_Geoserver(object):
         request_url = urljoin(self.url, resource)
         request_url = urljoin(request_url,os.path.basename(filename))
 
-        print(self.url)
         with open(filename, 'rb') as f:
             r = requests.put(
                 request_url,
@@ -45,7 +46,7 @@ class AWSM_Geoserver(object):
 
         headers = {'content-type' : 'application/json'}
         request_url = urljoin(self.url, resource)
-
+        print(request_url)
         r = requests.post(
             request_url,
             headers=headers,
@@ -73,7 +74,6 @@ class AWSM_Geoserver(object):
         """
         Use for getting information from geoserver
         """
-
         headers = {'Accept' : 'application/json'}
         request_url = urljoin(self.url, resource)
         r = requests.get(
@@ -81,7 +81,7 @@ class AWSM_Geoserver(object):
             headers=headers,
             auth=self.credential
         )
-        print(r)
+
         return r.json()
 
     def copy_data(self, fname, basin):
@@ -110,9 +110,9 @@ class AWSM_Geoserver(object):
 
         """
         store_exists = None
-        lyr_exists = None
+        layer_exists = None
 
-        # Does the workspace exist
+        # We always will check for the basins existance
         ws_exists = False
 
         # Does the workspace > datastore exist
@@ -121,7 +121,7 @@ class AWSM_Geoserver(object):
 
         # Does the workspace > datastore > layer exist
         if layer != None:
-            lyr_exists = False
+            layer_exists = False
 
         rjson = self.get('workspaces')
 
@@ -133,75 +133,82 @@ class AWSM_Geoserver(object):
             for w in ws_info['workspace']:
                 if basin.lower() == w['name']:
                     ws_exists = True
+                    break
 
-                    if store != None:
-                        # Grab info about this existing workspace
-                        ws_dict = self.get(w['href'])
-                        if upload_type != 'shapefile':
-                            # Grab info on rasters
-                            cs_dict = \
-                                self.get(ws_dict['workspace']['coverageStores'])
+            # Store existance requested
+            if store != None:
+                # Grab info about this existing workspace
+                ws_dict = self.get(w['href'])
 
-                            # Check if there are any coverage stores
-                            if cs_dict['coverageStores']:
-                                cs_info = cs_dict['coverageStores']
-                                # Check for matching name in the coverages
-                                for cs in cs_info['coverageStore']:
-                                    print(self.get(cs['href']))
+                if upload_type != 'shapefile':
+                    # Grab info on rasters
+                    cs_dict = self.get(ws_dict['workspace']['coverageStores'])
 
-                                    if store == cs['name']:
-                                        store_exists = True
-                                        break
+                    # Check if there are any coverage stores
+                    if cs_dict['coverageStores']:
+                        cs_info = cs_dict['coverageStores']
 
-                        else:
-                            # Grab info on datastores
-                            ds_dict = self.get(ws_dict['workspace']['dataStores'])
+                        # Check for matching name in the coverages
+                        for cs in cs_info['coverageStore']:
+                            if store == cs['name']:
+                                store_exists = True
+                                break
 
-                            # Check if there are any coverage stores
-                            if ds_dict['dataStores']:
-                                # Check for matching name in the dataStores
-                                for ds in ds_dict['dataStores']['dataStore']:
-                                    if store == ds['name']:
-                                        store_exists = True
+                # Shapefile type
+                else:
+                    print("Shapefiles not developed yet!")
+                    sys.exit()
+                    # # Grab info on datastores (vector data)
+                    # ds_dict = self.get(ws_dict['workspace']['dataStores'])
+                    #
+                    # # Check if there are any coverage stores
+                    # if ds_dict['dataStores']:
+                    #     # Check for matching name in the dataStores
+                    #     for ds in ds_dict['dataStores']['dataStore']:
+                    #         if store == ds['name']:
+                    #             store_exists = True
+                    #
+                    #             # Grab info about this existing shapfiles store
+                    #             lyr_dict = self.get(ds['href'])
+                    #             break
 
-                                        # Grab info about this existing shapfiles store
-                                        lyr_dict = self.get(ds['href'])
-                                        break
+            # layer existance requested
             if layer != None:
-                #rjson = self.get('layers')
-                pass
+                # Grab info about this existing store
+                store_info = self.get(cs['href'])
+                coverages = self.get(store_info['coverageStore']['coverages'])
+                for cv in coverages['coverages']['coverage']:
+                    if layer == cv['name']:
+                        layer_exists = True
 
-        result = [ws_exists, store_exists, lyr_exists]
+        result = [ws_exists, store_exists, layer_exists]
         expected = [r for r in result if r != None]
         truth = [r for r in result if r == True]
 
+        print(truth, expected)
+
         if len(truth) == len(expected):
+            print(result)
             return True
         else:
             return False
 
-    def create_coveragestore(self, basin, store, filename, raster_type='topo'):
+    def create_coveragestore(self, basin, store, filename):
         """
         Create a data store for raster data
         """
         bname = os.path.basename(filename)
         if not self.exists(basin, store):
-            if raster_type == 'topo':
-                print(filename)
-                store_name = "{}_topo".format(basin)
+            resource = 'workspaces/{}/coveragestores.json'.format(basin)
 
-                resource = 'workspaces/{}/coveragestores.json'.format(basin)
-
-                payload = {"coverageStore":{"name":store_name,
-                                            "type":"NetCDF",
-                                            "enabled":True,
-                                            "_default":False,
-                                            "workspace":{"name":basin},
-                                            "url":"file:{}/{}".format(basin,bname)}}
-                                            #"uri":basin.replace(" ","_")}}
-
-            elif raster_type == 'modeled':
-                pass
+            payload = {"coverageStore":{"name":store,
+                                        "type":"NetCDF",
+                                        "enabled":True,
+                                        "_default":False,
+                                        "workspace":{"name":basin},
+                                        "configure":"all",
+                                        "url":"file:{}/{}".format(basin,
+                                                                  bname)}}
 
             create_cs = ask_user("You are about to create a new geoserver"
                                  " coverage store called: {} in the {}\n Are "
@@ -214,11 +221,17 @@ class AWSM_Geoserver(object):
                 print("Creating a new datastore on geoserver...")
                 rjson = self.make(resource, payload)
                 print(rjson)
-                print("Attaching data to the new data store...")
 
-                #resource = '/workspaces/{}/coveragestores/{}.json]'.format(basin, store_name)
-                #rjson = self.pushf(resource, filename)
-                #print(rjson)
+
+    def create_layer(self, basin, store, layer):
+        """
+        Create a layer
+        """
+        resource = 'workspaces/{}/coveragestores/{}/coverages.json'.format(basin,store)
+        payload = {"coverage":{"name":layer}}
+        rjson = self.get(resource)
+        print(rjson)
+        self.make(resource, payload)
 
     def create_basin(self, basin):
         """
@@ -238,7 +251,6 @@ class AWSM_Geoserver(object):
                         'uri':basin.replace(' ','_')}
 
             rjson = self.make('workspaces', payload)
-            print(rjson)
 
     def upload(self, basin, filename, upload_type='modeled'):
         """
@@ -254,7 +266,6 @@ class AWSM_Geoserver(object):
         # Check for the upload type which determines the filename, and store type
         if upload_type == 'topo':
             self.upload_topo(remote_fname, basin)
-
         elif upload_type == 'flight':
             pass
         elif upload_type == 'modeled':
@@ -275,11 +286,31 @@ class AWSM_Geoserver(object):
         # Always call store names the same thing, <basin>_topo
         store_name = "{}_topo".format(basin)
 
-        #if not self.exists(basin, store=store_name):
-        self.create_coveragestore(basin, store_name, filename, raster_type='topo')
-        #else:
-            #print("Data store {} already exists...".format(store_name))
+        # Check to see if the store already exists...
+        if self.exists(basin, store=store_name):
+            print("Data store {} exists...".format(store_name))
 
+        self.create_coveragestore(basin, store_name, filename)
+
+        self.create_layers_from_netcdf(filename, basin, store_name)
+
+        print(rjson)
+
+    def create_layers_from_netcdf(self, filename, basin, store):
+        """
+        Since I am unable to figure out how geoserver sees the individual layers,
+        I am going to add them using the names locally and link them to the store
+        """
+
+        with Dataset(filename) as ds:
+            for name, var in ds.variables.items():
+                if name.lower() not in ['x','y','time']:
+                    if self.exists(basin, store, name):
+                        print("Layer {} from store {} in the {} exists...".format(name, store, basin))
+                    else:
+                        print("Adding {} from {} to the {}".format(name, store, basin))
+                        self.create_layer(basin, store, name)
+            ds.close()
 
 def ask_user(msg):
     """
