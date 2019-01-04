@@ -180,7 +180,6 @@ class AWSM_Geoserver(object):
 
                 # Check to see if there any coverages at all
                 if coverages['coverages']:
-                    print(coverages['coverages'])
                     for cv in coverages['coverages']['coverage']:
                         if layer == cv['name']:
                             layer_exists = True
@@ -189,10 +188,7 @@ class AWSM_Geoserver(object):
         expected = [r for r in result if r != None]
         truth = [r for r in result if r == True]
 
-        print(truth, expected)
-
         if len(truth) == len(expected):
-            print(result)
             return True
         else:
             return False
@@ -224,20 +220,32 @@ class AWSM_Geoserver(object):
             else:
                 print("Creating a new coverage on geoserver...")
                 rjson = self.make(resource, payload)
-                print(rjson)
-
 
     def create_layer(self, basin, store, layer):
         """
         Create a layer
         """
-        resource = 'workspaces/{}/coveragestores/{}/coverages.json'.format(basin,store)
-        payload = {"coverage":{"name":layer.lower(),
+        title = "{} {}".format(basin, layer).replace("_"," ")
+        lyr_name = layer.lower().replace(" ","_")
+        print("Adding layer {}".format(layer))
+        resource = 'workspaces/{}/coveragestores/{}/coverages.json'.format(basin, store)
+        payload = {"coverage":{"name":lyr_name,
+                               "nativeName":lyr_name,
+                               "nativeCoverageName":layer.replace(" ","_"),
+
                                "store":{"name": "{}:{}".format(basin, store)},
-                               "nativeFormat":"NetCDF",
-                               "title":"{} {}".format((basin.replace("_"," ")).capitolize(), layer)}}
+                                #"nativeFormat":"NetCDF",
+                                "enabled":True,
+                            #    "supportedFormats":{"string":["GEOTIFF","GIF","PNG","JPEG","TIFF"]},
+                            #    "namespace":{"name":basin,
+                            #                "href":"{}/namespaces/{}.json".format(self.url,basin)},
+                                "title":title.capitalize(),
+
+                                }
+                            }
         rjson = self.get(resource)
-        self.make(resource, payload)
+        response = self.make(resource, payload)
+        print("Layer: {} Response: {}".format(layer,response))
 
     def create_basin(self, basin):
         """
@@ -258,7 +266,6 @@ class AWSM_Geoserver(object):
                                      'enabled':True}}
 
             rjson = self.make('workspaces', payload)
-            print(rjson)
 
     def upload(self, basin, filename, upload_type='modeled'):
         """
@@ -302,9 +309,7 @@ class AWSM_Geoserver(object):
 
         self.create_layers_from_netcdf(filename, basin, store_name)
 
-        print(rjson)
-
-    def create_layers_from_netcdf(self, filename, basin, store):
+    def create_layers_from_netcdf(self, filename, basin, store, layers=None):
         """
         Since I am unable to figure out how geoserver sees the individual layers,
         I am going to add them using the names locally and link them to the store
