@@ -46,7 +46,7 @@ class AWSM_Geoserver(object):
 
         headers = {'content-type' : 'application/json'}
         request_url = urljoin(self.url, resource)
-        print(request_url)
+
         r = requests.post(
             request_url,
             headers=headers,
@@ -177,9 +177,13 @@ class AWSM_Geoserver(object):
                 # Grab info about this existing store
                 store_info = self.get(cs['href'])
                 coverages = self.get(store_info['coverageStore']['coverages'])
-                for cv in coverages['coverages']['coverage']:
-                    if layer == cv['name']:
-                        layer_exists = True
+
+                # Check to see if there any coverages at all
+                if coverages['coverages']:
+                    print(coverages['coverages'])
+                    for cv in coverages['coverages']['coverage']:
+                        if layer == cv['name']:
+                            layer_exists = True
 
         result = [ws_exists, store_exists, layer_exists]
         expected = [r for r in result if r != None]
@@ -215,10 +219,10 @@ class AWSM_Geoserver(object):
                                  " you sure you want to continue?"
                                  "".format(store, basin))
             if not create_cs:
-                print("Aborting creating a new datastore. Exiting...")
+                print("Aborting creating a new coverage store. Exiting...")
                 sys.exit()
             else:
-                print("Creating a new datastore on geoserver...")
+                print("Creating a new coverage on geoserver...")
                 rjson = self.make(resource, payload)
                 print(rjson)
 
@@ -228,9 +232,11 @@ class AWSM_Geoserver(object):
         Create a layer
         """
         resource = 'workspaces/{}/coveragestores/{}/coverages.json'.format(basin,store)
-        payload = {"coverage":{"name":layer}}
+        payload = {"coverage":{"name":layer.lower(),
+                               "store":{"name": "{}:{}".format(basin, store)},
+                               "nativeFormat":"NetCDF",
+                               "title":"{} {}".format((basin.replace("_"," ")).capitolize(), layer)}}
         rjson = self.get(resource)
-        print(rjson)
         self.make(resource, payload)
 
     def create_basin(self, basin):
@@ -247,10 +253,12 @@ class AWSM_Geoserver(object):
 
         else:
             print("Creating a new basin on geoserver...")
-            payload = {'workspace': {'name':basin},
-                        'uri':basin.replace(' ','_')}
+            payload = {'workspace': {'name':basin,
+                                    # 'uri':basin.replace(' ','_'),
+                                     'enabled':True}}
 
             rjson = self.make('workspaces', payload)
+            print(rjson)
 
     def upload(self, basin, filename, upload_type='modeled'):
         """
@@ -304,7 +312,7 @@ class AWSM_Geoserver(object):
 
         with Dataset(filename) as ds:
             for name, var in ds.variables.items():
-                if name.lower() not in ['x','y','time']:
+                if name.lower() not in ['x','y','time','projection']:
                     if self.exists(basin, store, name):
                         print("Layer {} from store {} in the {} exists...".format(name, store, basin))
                     else:
