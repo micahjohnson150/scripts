@@ -193,7 +193,6 @@ class AWSM_Geoserver(object):
         else:
             print("Creating a new basin on geoserver...")
             payload = {'workspace': {'name':basin,
-                                    # 'uri':basin.replace(' ','_'),
                                      'enabled':True}}
 
             rjson = self.make('workspaces', payload)
@@ -209,28 +208,31 @@ class AWSM_Geoserver(object):
 
         """
         bname = os.path.basename(filename)
-        if not self.exists(basin, store):
-            resource = 'workspaces/{}/coveragestores.json'.format(basin)
+        # Check to see if the store already exists...
+        if self.exists(basin, store=store):
+            print("Coverage store {} exists...".format(store_name))
 
-            payload = {"coverageStore":{"name":store,
-                                        "type":"NetCDF",
-                                        "enabled":True,
-                                        "_default":False,
-                                        "workspace":{"name":basin},
-                                        "configure":"all",
-                                        "url":"file:{}/{}".format(basin,
-                                                                  bname)}}
+        resource = 'workspaces/{}/coveragestores.json'.format(basin)
 
-            create_cs = ask_user("You are about to create a new geoserver"
-                                 " coverage store called: {} in the {}\n Are "
-                                 " you sure you want to continue?"
-                                 "".format(store, basin))
-            if not create_cs:
-                print("Aborting creating a new coverage store. Exiting...")
-                sys.exit()
-            else:
-                print("Creating a new coverage on geoserver...")
-                rjson = self.make(resource, payload)
+        payload = {"coverageStore":{"name":store,
+                                    "type":"NetCDF",
+                                    "enabled":True,
+                                    "_default":False,
+                                    "workspace":{"name":basin},
+                                    "configure":"all",
+                                    "url":"file:{}/{}".format(basin,
+                                                              bname)}}
+
+        create_cs = ask_user("You are about to create a new geoserver"
+                             " coverage store called: {} in the {}\n Are "
+                             " you sure you want to continue?"
+                             "".format(store, basin))
+        if not create_cs:
+            print("Aborting creating a new coverage store. Exiting...")
+            sys.exit()
+        else:
+            print("Creating a new coverage on geoserver...")
+            rjson = self.make(resource, payload)
 
     def create_layer(self, basin, store, layer):
         """
@@ -258,59 +260,6 @@ class AWSM_Geoserver(object):
                             }
         response = self.make(resource, payload)
 
-    def upload(self, basin, filename, upload_type='modeled'):
-        """
-        Generic upload function to redirect to specific uploading of special
-        data types, under development, currently only topo images work. Requires
-        a local filepath which is then uploaded to the geoserver.
-
-        Args:
-            basin: string name of the basin/workspace to upload to.
-            filename: path of a local to the script file to upload
-            upload_type:
-        """
-        # Ensure that this workspace exists
-        if not self.exists(basin):
-            self.create_basin(basin)
-
-        # Copy users data up to the remote location
-        remote_fname = self.copy_data(filename, basin)
-
-        # Check for the upload type which determines the filename, and store type
-        if upload_type == 'topo':
-            self.upload_topo(remote_fname, basin)
-        elif upload_type == 'flight':
-            pass
-        elif upload_type == 'modeled':
-            pass
-        elif upload_type == 'shapefile':
-            pass
-        else:
-            raise ValueError("Invalid upload type!")
-
-    def upload_topo(self, filename, basin):
-        """
-        Uploads the basins topo images which are static. These images include:
-        * dem
-        * basin mask
-        * subbasin masks
-        * vegetation images relating to types, albedo, and heights
-
-        Args:
-            filename: Remote path of a netcdf to upload
-            basin: Basin associated to the topo image
-        """
-        # Always call store names the same thing, <basin>_topo
-        store_name = "{}_topo".format(basin)
-
-        # Check to see if the store already exists...
-        if self.exists(basin, store=store_name):
-            print("Data store {} exists...".format(store_name))
-
-        self.create_coveragestore(basin, store_name, filename)
-
-        self.create_layers_from_netcdf(filename, basin, store_name)
-
     def create_layers_from_netcdf(self, filename, basin, store, layers=None):
         """
         Opens a netcdf locally and adds all layers to the geoserver that are in
@@ -336,10 +285,86 @@ class AWSM_Geoserver(object):
             for name, var in ds.variables.items():
                 if name.lower() not in ['x','y','time','projection']:
                     if self.exists(basin, store, name):
-                        print("Layer {} from store {} in the {} exists...".format(name, store, basin))
+                        print("Layer {} from store {} in the {} exists..."
+                              "".format(name, store, basin))
                     else:
-                        print("Adding {} from {} to the {}".format(name, store, basin))
+                        print("Adding {} from {} to the {}".format(name,
+                                                                   store,
+                                                                   basin))
                         self.create_layer(basin, store, name)
+
+    def upload(self, basin, filename, upload_type='modeled'):
+        """
+        Generic upload function to redirect to specific uploading of special
+        data types, under development, currently only topo images work. Requires
+        a local filepath which is then uploaded to the geoserver.
+
+        Args:
+            basin: string name of the basin/workspace to upload to.
+            filename: path of a local to the script file to upload
+            upload_type:
+        """
+        # Ensure that this workspace exists
+        if not self.exists(basin):
+            self.create_basin(basin)
+
+        # Copy users data up to the remote location
+        remote_fname = self.copy_data(filename, basin)
+
+        # Check for the upload type which determines the filename, and store type
+        if upload_type == 'topo':
+            self.upload_topo(remote_fname, basin)
+
+        elif upload_type == 'modeled':
+            self.upload_modeled(remote_fname, basin)
+
+        elif upload_type == 'flight':
+            print("Uploading flights is undeveloped")
+
+        elif upload_type == 'shapefile':
+            print("Uploading shapefiles is undeveloped")
+
+        else:
+            raise ValueError("Invalid upload type!")
+
+    def upload_topo(self, filename, basin):
+        """
+        Uploads the basins topo images which are static. These images include:
+        * dem
+        * basin mask
+        * subbasin masks
+        * vegetation images relating to types, albedo, and heights
+
+        Args:
+            filename: Remote path of a netcdf to upload
+            basin: Basin associated to the topo image
+        """
+        # Always call store names the same thing, <basin>_topo
+        store_name = "{}_topo".format(basin)
+
+        self.create_coveragestore(basin, store_name, filename)
+
+        self.create_layers_from_netcdf(filename, basin, store_name)
+
+    def upload_modeled(self, filename, basin):
+        """
+        Uploads the basins modeled data. These images include:
+        * density
+        * specific_mass
+
+        Args:
+            filename: Remote path of a netcdf to upload
+            basin: Basin associated to the topo image
+        """
+        # Get the date from the wyhr
+
+        # Always call store names the same thing, <basin>_snow_<date>
+        store_name = "{}_snow_{}".format(basin, date)
+
+        self.create_coveragestore(basin, store_name, filename)
+
+        self.create_layers_from_netcdf(filename, basin, store_name,
+                                       layers=['density','specific_mass'])
 
 
 def ask_user(msg):
