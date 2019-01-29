@@ -17,7 +17,7 @@ class AWSM_Geoserver(object):
 
         self.password = cred['password']
         self.username = cred['username']
-        self.url = cred['url']
+        self.url = cred['url'] + '/rest'
         self.credential = (self.username, self.password)
 
     def make(self, resource, payload):
