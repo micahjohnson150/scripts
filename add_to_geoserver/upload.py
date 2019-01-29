@@ -14,10 +14,10 @@ class AWSM_Geoserver(object):
         with open(fname) as fp:
             cred = json.load(fp)
             fp.close()
-
+        print(cred)
         self.password = cred['password']
         self.username = cred['username']
-        self.url = cred['url'] + '/rest'
+        self.url = urljoin(cred['url'], 'rest/')
         self.credential = (self.username, self.password)
 
     def make(self, resource, payload):
@@ -34,7 +34,6 @@ class AWSM_Geoserver(object):
 
         headers = {'content-type' : 'application/json'}
         request_url = urljoin(self.url, resource)
-
         r = requests.post(
             request_url,
             headers=headers,
@@ -59,12 +58,12 @@ class AWSM_Geoserver(object):
 
         headers = {'Accept' : 'application/json'}
         request_url = urljoin(self.url, resource)
+
         r = requests.get(
             request_url,
             headers=headers,
             auth=self.credential
         )
-
         return r.json()
 
     def copy_data(self, fname, basin):
@@ -82,13 +81,15 @@ class AWSM_Geoserver(object):
         Returns:
             final_fname: The remote path to the file we copied
         """
-
+        files = {'file': open(fname, 'rb')}
+        print(files['file'])
         bname =  os.path.basename(fname)
-        final_name = ('/home/micahjohnson/projects/nwrc_geoserver/data/{}/{}'
-                      ''.format(basin, bname))
 
-        print("Copying {} to geoserver {}".format(bname, final_name))
-        copyfile(os.path.abspath(fname), final_name)
+        # Use rest api to add a new resource
+        location_url = urljoin(self.url, "resource/{}/{}".format(basin, bname))
+        print("Copying {} to geoserver {}".format(bname, location_url))
+        r = requests.post(location_url, files=files)
+        print(r)
 
         return final_name
 
@@ -122,7 +123,6 @@ class AWSM_Geoserver(object):
         # Does the workspace > datastore > layer exist
         if layer != None:
             layer_exists = False
-
         rjson = self.get('workspaces')
 
         # Are there any workspaces?
