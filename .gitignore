@@ -1,0 +1,6 @@
+*/*.nc
+/add_to_geoserver/*_subbasin.*
+*.aux*
+*/*.tif*
+*/__pycache__
+
