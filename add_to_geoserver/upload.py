@@ -2,11 +2,11 @@ import json
 import argparse
 import sys
 import requests
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 from shutil import copyfile
 import os
 from netCDF4 import Dataset
-
+from subprocess import check_output
 
 class AWSM_Geoserver(object):
     def __init__(self, fname):
@@ -14,11 +14,17 @@ class AWSM_Geoserver(object):
         with open(fname) as fp:
             cred = json.load(fp)
             fp.close()
-        print(cred)
         self.password = cred['password']
         self.username = cred['username']
         self.url = urljoin(cred['url'], 'rest/')
+
+        # Extract the base url
+        self.base_url = urlparse(self.url).netloc
+
         self.credential = (self.username, self.password)
+        self.pem = cred['pem']
+        self.data = cred['data']
+
 
     def make(self, resource, payload):
         """
@@ -56,7 +62,7 @@ class AWSM_Geoserver(object):
             dict: Dictionary containing infor about the resource
         """
 
-        headers = {'Accept' : 'application/json'}
+        headers = {'Accept':'application/json'}
         request_url = urljoin(self.url, resource)
 
         r = requests.get(
@@ -80,16 +86,25 @@ class AWSM_Geoserver(object):
 
         Returns:
             final_fname: The remote path to the file we copied
-        """
-        files = {'file': open(fname, 'rb')}
-        print(files['file'])
-        bname =  os.path.basename(fname)
+        # """
 
-        # Use rest api to add a new resource
-        location_url = urljoin(self.url, "resource/{}/{}".format(basin, bname))
-        print("Copying {} to geoserver {}".format(bname, location_url))
-        r = requests.post(location_url, files=files)
-        print(r)
+        bname =  os.path.basename(fname)
+        final_fname = os.path.join(self.data, basin, bname)
+
+        # files = {'file': open(fname, 'rb')}
+        # print(files['file'])
+        # headers = {"Content-Type": "application/zip",
+        #             "Accept": "application/json"}
+        #
+        # # Use rest api to add a new resource
+        # location_url = urljoin(self.url, "resource/{}/{}".format(basin, bname))
+        # print("Copying {} to geoserver {}".format(bname, location_url))
+        # r = requests.put(location_url, files=files, headers=headers)
+        # print(r)
+        s = check_output("scp -i {} {} ubuntu@{}:{}".format(self.pem,
+                                                            fname,
+                                                            self.base_url,
+                                                            final_name))
 
         return final_name
 
@@ -270,7 +285,7 @@ class AWSM_Geoserver(object):
             basin: String name of the targeted basin/workspace
             store: String name of a targeted netcdf coverage store
             layers: List of layers to add, if none add all layers except x,y,
-                    time,and projection
+                    time, and projection
         """
 
         ds = Dataset(filename)
@@ -356,7 +371,6 @@ class AWSM_Geoserver(object):
             filename: Remote path of a netcdf to upload
             basin: Basin associated to the topo image
         """
-        # Get the date from the wyhr
 
         # Always call store names the same thing, <basin>_snow_<date>
         store_name = "{}_snow_{}".format(basin, date)
@@ -364,7 +378,7 @@ class AWSM_Geoserver(object):
         self.create_coveragestore(basin, store_name, filename)
 
         self.create_layers_from_netcdf(filename, basin, store_name,
-                                       layers=['density','specific_mass'])
+                                       layers=['snow_density','specific_mass'])
 
 
 def ask_user(msg):
