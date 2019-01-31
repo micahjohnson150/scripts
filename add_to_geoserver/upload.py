@@ -5,11 +5,32 @@ import requests
 from urllib.parse import urljoin, urlparse
 from shutil import copyfile
 import os
-from netCDF4 import Dataset
+from netCDF4 import Dataset, num2date
 from subprocess import check_output
+import logging
+import coloredlogs
+import certifi
+
+__version__ = '0.1.0'
 
 class AWSM_Geoserver(object):
-    def __init__(self, fname):
+    def __init__(self, fname, log=None, level="DEBUG"):
+
+        # Setup external logging if need be
+        if log==None:
+            self.log = logging.getLogger(__name__)
+        else:
+            self.log = log
+
+        # Assign some colors and formats
+        coloredlogs.install(fmt='%(levelname)-5s %(message)s', level=level,
+                                                               logger=self.log)
+
+        self.log.info("\n=============================================\n"
+                      "      Geoserver Upload Script v{}:\n"
+                      "=============================================\n"
+                      "".format(__version__))
+
 
         with open(fname) as fp:
             cred = json.load(fp)
@@ -20,7 +41,6 @@ class AWSM_Geoserver(object):
 
         # Extract the base url
         self.base_url = urlparse(self.url).netloc
-
         self.credential = (self.username, self.password)
         self.pem = cred['pem']
         self.data = cred['data']
@@ -40,13 +60,14 @@ class AWSM_Geoserver(object):
 
         headers = {'content-type' : 'application/json'}
         request_url = urljoin(self.url, resource)
+        self.log.debug("POST request to {}".format(request_url))
         r = requests.post(
             request_url,
             headers=headers,
             data=json.dumps(payload),
+            verify=False,
             auth=self.credential
         )
-
         return r.raise_for_status()
 
     def get(self, resource):
@@ -64,15 +85,39 @@ class AWSM_Geoserver(object):
 
         headers = {'Accept':'application/json'}
         request_url = urljoin(self.url, resource)
+        self.log.debug("GET request to {}".format(request_url))
 
         r = requests.get(
             request_url,
+            verify=False,
             headers=headers,
             auth=self.credential
         )
         return r.json()
 
-    def copy_data(self, fname, basin):
+    def extract_data(self,fname, upload_type='modeled'):
+        """
+        Args:
+            fname: String path to a local file.
+            upload_type: specifies whether to name a file differently
+        Returns:
+            fname: New name of file where data was extracted.
+        """
+        # Add a parsed date to the string to avoid overwriting snow.nc
+        if upload_type=='modeled':
+            bname = os.path.basename(fname)
+            self.log.info("Retriving date from netcdf...")
+            ds = Dataset(fname)
+            time = ds.variables['time']
+            dates = num2date(time[:], units=time.units, calendar=time.calendar)
+            cleaned_date = "".join([c for c in dates[0].isoformat() if c not in ':-'])[:-2]
+            ds.close()
+            bname = bname.split(".")[0] + "_{}.nc".format(cleaned_date)
+            fname = bname
+
+        return fname
+
+    def copy_data(self, fname, basin, upload_type='modeled'):
         """
         Data for the geoserver has to be in the host location for this. We
         working locally for now so we will create a mock function to move data
@@ -83,14 +128,17 @@ class AWSM_Geoserver(object):
         Args:
             fname: String path to a local file.
             basin: String name of the targeted basin/workspace to put the file in
+            upload_type: specifies whether to name a file differently
 
         Returns:
             final_fname: The remote path to the file we copied
         # """
-
         bname =  os.path.basename(fname)
-        final_fname = os.path.join(self.data, basin, bname)
 
+        final_fname = os.path.join(self.data, basin, bname)
+        self.log.info("Copying local data to remote, this may take a couple "
+                      "minutes...")
+        self.log.debug("SCP info:{} -----> {}".format(bname,final_fname))
         # files = {'file': open(fname, 'rb')}
         # print(files['file'])
         # headers = {"Content-Type": "application/zip",
@@ -101,12 +149,13 @@ class AWSM_Geoserver(object):
         # print("Copying {} to geoserver {}".format(bname, location_url))
         # r = requests.put(location_url, files=files, headers=headers)
         # print(r)
-        s = check_output("scp -i {} {} ubuntu@{}:{}".format(self.pem,
-                                                            fname,
+        s = check_output(["scp", "-i", self.pem, fname, "ubuntu@{}:{}".format(
                                                             self.base_url,
-                                                            final_name))
+                                                            final_fname)],
+                                                            shell=False,
+                                                            universal_newlines=True)
 
-        return final_name
+        return final_fname
 
     def exists(self, basin, store=None, layer=None):
         """
@@ -138,6 +187,7 @@ class AWSM_Geoserver(object):
         # Does the workspace > datastore > layer exist
         if layer != None:
             layer_exists = False
+
         rjson = self.get('workspaces')
 
         # Are there any workspaces?
@@ -184,9 +234,12 @@ class AWSM_Geoserver(object):
         expected = [r for r in result if r != None]
         truth = [r for r in result if r == True]
 
+        msg = "> ".join([r for r in [basin, store, layer] if r !=None])
         if len(truth) == len(expected):
+            self.log.debug("{} already exists on the geoserver.".format(msg))
             return True
         else:
+            self.log.debug("{} doesn't exist on the geoserver.".format(msg))
             return False
 
     def create_basin(self, basin):
@@ -199,14 +252,14 @@ class AWSM_Geoserver(object):
         """
 
         create_ws = ask_user("You are about to create a new basin on the"
-                             " geoserver called: {}\n Are you sure you want"
+                             " geoserver called: {}\nAre you sure you want"
                              " to continue?".format(basin))
         if not create_ws:
-            print("Aborting creating a new basin. Exiting...")
+            self.log.info("Aborting creating a new basin. Exiting...")
             sys.exit()
 
         else:
-            print("Creating a new basin on geoserver...")
+            self.log.info("Creating a new basin on geoserver...")
             payload = {'workspace': {'name':basin,
                                      'enabled':True}}
 
@@ -223,9 +276,10 @@ class AWSM_Geoserver(object):
 
         """
         bname = os.path.basename(filename)
+
         # Check to see if the store already exists...
         if self.exists(basin, store=store):
-            print("Coverage store {} exists...".format(store_name))
+            self.log.info("Coverage store {} exists...".format(store))
 
         resource = 'workspaces/{}/coveragestores.json'.format(basin)
 
@@ -233,20 +287,20 @@ class AWSM_Geoserver(object):
                                     "type":"NetCDF",
                                     "enabled":True,
                                     "_default":False,
-                                    "workspace":{"name":basin},
+                                    "workspace":{"name": basin},
                                     "configure":"all",
-                                    "url":"file:{}/{}".format(basin,
-                                                              bname)}}
+                                    "url":"file:{}/{}".format(basin, bname)}}
 
         create_cs = ask_user("You are about to create a new geoserver"
                              " coverage store called: {} in the {}\n Are "
                              " you sure you want to continue?"
                              "".format(store, basin))
         if not create_cs:
-            print("Aborting creating a new coverage store. Exiting...")
+            self.log.info("Aborting creating a new coverage store. Exiting...")
             sys.exit()
         else:
-            print("Creating a new coverage on geoserver...")
+            self.log.info("Creating a new coverage on geoserver...")
+            print(payload)
             rjson = self.make(resource, payload)
 
     def create_layer(self, basin, store, layer):
@@ -275,38 +329,27 @@ class AWSM_Geoserver(object):
                             }
         response = self.make(resource, payload)
 
-    def create_layers_from_netcdf(self, filename, basin, store, layers=None):
+    def layers(self, basin, store, layers=None):
         """
         Opens a netcdf locally and adds all layers to the geoserver that are in
         the entire image if layers = None otherwise adds only the layers listed.
 
         Args:
-            filename: Path of a local netcdf.
             basin: String name of the targeted basin/workspace
             store: String name of a targeted netcdf coverage store
             layers: List of layers to add, if none add all layers except x,y,
                     time, and projection
         """
 
-        ds = Dataset(filename)
-
-        undesired = ['x','y','time','projection']
-        if layers != None:
-            for name, var in ds.variables.items():
-                if name not in layers:
-                    undesired.append(name)
-
-        with Dataset(filename) as ds:
-            for name, var in ds.variables.items():
-                if name.lower() not in ['x','y','time','projection']:
-                    if self.exists(basin, store, name):
-                        print("Layer {} from store {} in the {} exists..."
-                              "".format(name, store, basin))
-                    else:
-                        print("Adding {} from {} to the {}".format(name,
-                                                                   store,
-                                                                   basin))
-                        self.create_layer(basin, store, name)
+        for name in layers:
+            if self.exists(basin, store, name):
+                self.log.info("Layer {} from store {} in the {} exists..."
+                      "".format(name, store, basin))
+            else:
+                self.log.info("Adding {} from {} to the {}".format(name,
+                                                           store,
+                                                           basin))
+                self.create_layer(basin, store, name)
 
     def upload(self, basin, filename, upload_type='modeled'):
         """
@@ -319,30 +362,48 @@ class AWSM_Geoserver(object):
             filename: path of a local to the script file to upload
             upload_type:
         """
+        self.log.info("Associated Basin: {}".format(basin))
+        self.log.info("Data Upload Type: {}".format(upload_type))
+        self.log.info("Source Filename: {}".format(filename))
+
         # Ensure that this workspace exists
         if not self.exists(basin):
+
             self.create_basin(basin)
+        # Reduce the size of netcdfs if possible return the new filename
+        filename = self.extract_data(filename, upload_type=upload_type)
 
         # Copy users data up to the remote location
-        remote_fname = self.copy_data(filename, basin)
+        remote_fname = self.copy_data(filename, basin, upload_type=upload_type)
+
+        # Grab the layer names
+        ds = Dataset(filename)
+        layers = []
+        for name, v in ds.variables.items():
+            if name not in ['time','x','y','projection']:
+                layers.append(v)
+
+        if len(layers) == 0:
+            self.log.error("No variables found in netcdf...exiting.")
+            sys.exit()
 
         # Check for the upload type which determines the filename, and store type
         if upload_type == 'topo':
-            self.upload_topo(remote_fname, basin)
+            self.submit_topo(remote_fname, basin, layers=layers)
 
         elif upload_type == 'modeled':
-            self.upload_modeled(remote_fname, basin)
+            self.submit_modeled(remote_fname, basin, layers=layers)
 
         elif upload_type == 'flight':
-            print("Uploading flights is undeveloped")
+            self.log.error("Uploading flights is undeveloped")
 
         elif upload_type == 'shapefile':
-            print("Uploading shapefiles is undeveloped")
+            self.log.error("Uploading shapefiles is undeveloped")
 
         else:
             raise ValueError("Invalid upload type!")
 
-    def upload_topo(self, filename, basin):
+    def submit_topo(self, filename, basin, layers=None):
         """
         Uploads the basins topo images which are static. These images include:
         * dem
@@ -353,32 +414,38 @@ class AWSM_Geoserver(object):
         Args:
             filename: Remote path of a netcdf to upload
             basin: Basin associated to the topo image
+            layers: Netcdf variables names to add as layers on GS
         """
         # Always call store names the same thing, <basin>_topo
         store_name = "{}_topo".format(basin)
 
         self.create_coveragestore(basin, store_name, filename)
 
-        self.create_layers_from_netcdf(filename, basin, store_name)
+        self.create_layers_from_netcdf(filename, basin, store_name,
+                                                 layers=layers)
 
-    def upload_modeled(self, filename, basin):
+    def submit_modeled(self, filename, basin, layers=None):
         """
         Uploads the basins modeled data. These images include:
         * density
         * specific_mass
+        * depth
 
         Args:
             filename: Remote path of a netcdf to upload
             basin: Basin associated to the topo image
+            layers: Netcdf variables names to add as layers on GS
+
         """
 
         # Always call store names the same thing, <basin>_snow_<date>
-        store_name = "{}_snow_{}".format(basin, date)
+        store_name = "{}_{}".format(basin,
+                                    os.path.basename(filename).split(".")[0])
 
         self.create_coveragestore(basin, store_name, filename)
 
         self.create_layers_from_netcdf(filename, basin, store_name,
-                                       layers=['snow_density','specific_mass'])
+                                       layers=layers)
 
 
 def ask_user(msg):
@@ -404,7 +471,7 @@ def ask_user(msg):
             acceptable = True
             response = False
         else:
-            print("Unrecognized answer, please use (y, yes, n, no)")
+            self.log.info("Unrecognized answer, please use (y, yes, n, no)")
     return response
 
 
@@ -421,7 +488,7 @@ def main():
                     )
 
     p.add_argument('-b','--basin', dest='basin',
-                    required=True,
+                    required=True, choices=['brb', 'kaweah', 'kings', 'lakes', 'merced', 'sanjoaquin'],
                     help="Basin name to submit to which is also the geoserver"
                          " workspace name")
 
