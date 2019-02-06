@@ -10,6 +10,9 @@ from subprocess import check_output
 import logging
 import coloredlogs
 import certifi
+from spatialnc.proj import add_proj
+from spatialnc.utilities import copy_nc
+
 
 __version__ = '0.1.0'
 
@@ -48,7 +51,7 @@ class AWSM_Geoserver(object):
 
     def make(self, resource, payload):
         """
-        wrapper for post request.
+        Wrapper for post request.
 
         Args:
             resource: Relative location from the http root
@@ -95,33 +98,59 @@ class AWSM_Geoserver(object):
         )
         return r.json()
 
-    def extract_data(self,fname, upload_type='modeled'):
+    def extract_data(self, fname, upload_type='modeled', espg=None):
         """
         Args:
             fname: String path to a local file.
             upload_type: specifies whether to name a file differently
+            espg: Projection code to use if projection information not found if none, user will be prompted
+
         Returns:
             fname: New name of file where data was extracted.
         """
-        # Add a parsed date to the string to avoid overwriting snow.nc
-        if upload_type=='modeled':
-            bname = os.path.basename(fname)
-            self.log.info("Retriving date from netcdf...")
-            ds = Dataset(fname)
-            time = ds.variables['time']
-            dates = num2date(time[:], units=time.units, calendar=time.calendar)
-            cleaned_date = "".join([c for c in dates[0].isoformat() if c not in ':-'])[:-2]
+
+        # Check for netcdfs
+        if fname.split('.')[-1] == 'nc':
+            # AWSM related items should have a variable called projection
+            ds = Dataset(fname, 'r') # original
+
+            # Add a parsed date to the string to avoid overwriting snow.nc
+            if upload_type=='modeled':
+                bname = os.path.basename(fname)
+                self.log.info("Retrieving date from netcdf...")
+
+                time = ds.variables['time']
+                dates = num2date(time[:], units=time.units, calendar=time.calendar)
+                cleaned_date = "".join([c for c in dates[0].isoformat() if c not in ':-'])[:-2]
+                bname = bname.split(".")[0] + "_{}.nc".format(cleaned_date)
+                fname = bname
+
+                self.log.info("Copying netcdf...")
+
+                # Only copy some of the variables
+                exclude_vars = [v for v in ds.variables.keys() if v not in \
+                    ['x','y','time','snow_density','specific_mass','thickness','projection']]
+                new_ds = copy_nc(ds, fname, exclude = exclude_vars)
+
+            # Check for missing projection
+            if 'projection' not in new_ds.variables:
+                self.log.info("Netcdf is missing projection information...")
+
+                # Missing ESPG from args
+                if espg == None:
+                    espg = input("No projection detected. Enter the ESPG code for the data:\n")
+
+                self.log.info("Adding projection information using ESPG code {}...".format(espg))
+                new_ds = add_proj(new_ds, espg)
+
+            new_ds.close()
             ds.close()
-            bname = bname.split(".")[0] + "_{}.nc".format(cleaned_date)
-            fname = bname
 
         return fname
 
     def copy_data(self, fname, basin, upload_type='modeled'):
         """
         Data for the geoserver has to be in the host location for this. We
-        working locally for now so we will create a mock function to move data
-        then upgrade to scp of sorts.
 
         Copies data from users location to geoserver/data/<basin>/
 
@@ -132,23 +161,13 @@ class AWSM_Geoserver(object):
 
         Returns:
             final_fname: The remote path to the file we copied
-        # """
+        """
         bname =  os.path.basename(fname)
 
         final_fname = os.path.join(self.data, basin, bname)
         self.log.info("Copying local data to remote, this may take a couple "
                       "minutes...")
-        self.log.debug("SCP info:{} -----> {}".format(bname,final_fname))
-        # files = {'file': open(fname, 'rb')}
-        # print(files['file'])
-        # headers = {"Content-Type": "application/zip",
-        #             "Accept": "application/json"}
-        #
-        # # Use rest api to add a new resource
-        # location_url = urljoin(self.url, "resource/{}/{}".format(basin, bname))
-        # print("Copying {} to geoserver {}".format(bname, location_url))
-        # r = requests.put(location_url, files=files, headers=headers)
-        # print(r)
+        self.log.debug("SCP info:{} -----> {}".format(bname, final_fname))
         s = check_output(["scp", "-i", self.pem, fname, "ubuntu@{}:{}".format(
                                                             self.base_url,
                                                             final_fname)],
@@ -234,7 +253,8 @@ class AWSM_Geoserver(object):
         expected = [r for r in result if r != None]
         truth = [r for r in result if r == True]
 
-        msg = "> ".join([r for r in [basin, store, layer] if r !=None])
+        msg = " > ".join([r for r in [basin, store, layer] if r !=None])
+
         if len(truth) == len(expected):
             self.log.debug("{} already exists on the geoserver.".format(msg))
             return True
@@ -289,7 +309,7 @@ class AWSM_Geoserver(object):
                                     "_default":False,
                                     "workspace":{"name": basin},
                                     "configure":"all",
-                                    "url":"file:{}/{}".format(basin, bname)}}
+                                    "url":"file:basins/{}/{}".format(basin, bname)}}
 
         create_cs = ask_user("You are about to create a new geoserver"
                              " coverage store called: {} in the {}\n Are "
@@ -300,7 +320,7 @@ class AWSM_Geoserver(object):
             sys.exit()
         else:
             self.log.info("Creating a new coverage on geoserver...")
-            print(payload)
+            self.log.debug(payload)
             rjson = self.make(resource, payload)
 
     def create_layer(self, basin, store, layer):
@@ -327,9 +347,10 @@ class AWSM_Geoserver(object):
                                "title":title
                                 }
                             }
+        self.log.debug("Payload: {}".format(payload))
         response = self.make(resource, payload)
 
-    def layers(self, basin, store, layers=None):
+    def create_layers_from_netcdf(self, basin, store, layers=None):
         """
         Opens a netcdf locally and adds all layers to the geoserver that are in
         the entire image if layers = None otherwise adds only the layers listed.
@@ -351,7 +372,7 @@ class AWSM_Geoserver(object):
                                                            basin))
                 self.create_layer(basin, store, name)
 
-    def upload(self, basin, filename, upload_type='modeled'):
+    def upload(self, basin, filename, upload_type='modeled', espg=None):
         """
         Generic upload function to redirect to specific uploading of special
         data types, under development, currently only topo images work. Requires
@@ -360,7 +381,7 @@ class AWSM_Geoserver(object):
         Args:
             basin: string name of the basin/workspace to upload to.
             filename: path of a local to the script file to upload
-            upload_type:
+            upload_type: Determines how the data is uploaded
         """
         self.log.info("Associated Basin: {}".format(basin))
         self.log.info("Data Upload Type: {}".format(upload_type))
@@ -370,8 +391,9 @@ class AWSM_Geoserver(object):
         if not self.exists(basin):
 
             self.create_basin(basin)
+
         # Reduce the size of netcdfs if possible return the new filename
-        filename = self.extract_data(filename, upload_type=upload_type)
+        filename = self.extract_data(filename, upload_type=upload_type, espg=espg)
 
         # Copy users data up to the remote location
         remote_fname = self.copy_data(filename, basin, upload_type=upload_type)
@@ -381,8 +403,9 @@ class AWSM_Geoserver(object):
         layers = []
         for name, v in ds.variables.items():
             if name not in ['time','x','y','projection']:
-                layers.append(v)
+                layers.append(name)
 
+        print(layers)
         if len(layers) == 0:
             self.log.error("No variables found in netcdf...exiting.")
             sys.exit()
@@ -443,9 +466,8 @@ class AWSM_Geoserver(object):
                                     os.path.basename(filename).split(".")[0])
 
         self.create_coveragestore(basin, store_name, filename)
-
-        self.create_layers_from_netcdf(filename, basin, store_name,
-                                       layers=layers)
+        print(layers)
+        self.create_layers_from_netcdf(basin, store_name, layers=layers)
 
 
 def ask_user(msg):
@@ -503,13 +525,19 @@ def main():
                     required=False,
                     help="Upload type dictates how some items are uploaded.")
 
+    p.add_argument('-e','--espg', dest='espg',
+                    type=int, default=None,
+                    help="espg value representing the projection information to"
+                    "add to the netcdf")
+
+
     args = p.parse_args()
 
     # Get an instance to interact with the geoserver.
     gs = AWSM_Geoserver(args.credentials)
 
     # Upload a file
-    gs.upload(args.basin,args.filename, upload_type=args.upload_type)
+    gs.upload(args.basin,args.filename, upload_type=args.upload_type, espg=args.espg)
 
 
 if __name__ =='__main__':
