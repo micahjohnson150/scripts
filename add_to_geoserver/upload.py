@@ -12,7 +12,7 @@ import coloredlogs
 import certifi
 from spatialnc.proj import add_proj
 from spatialnc.utilities import copy_nc, mask_nc
-
+from datetime import datetime as dt
 
 __version__ = '0.1.0'
 
@@ -98,7 +98,7 @@ class AWSM_Geoserver(object):
         )
         return r.json()
 
-    def extract_data(self, fname, upload_type='modeled', espg=None, mask=None, date=None):
+    def extract_data(self, fname, upload_type='modeled', espg=None, mask=None):
         """
         Args:
             fname: String path to a local file.
@@ -124,7 +124,8 @@ class AWSM_Geoserver(object):
                 self.log.info("Retrieving date from netcdf...")
                 time = ds.variables['time']
                 dates = num2date(time[:], units=time.units, calendar=time.calendar)
-                cleaned_date = "".join([c for c in dates[0].isoformat() if c not in ':-'])[:-2]
+                self.date = dates[0]
+                cleaned_date = "".join([c for c in self.date.isoformat() if c not in ':-'])[:-2]
                 bname = bname.split(".")[0] + "_{}.nc".format(cleaned_date)
                 fname = bname
 
@@ -137,7 +138,7 @@ class AWSM_Geoserver(object):
                 mask_exlcude = []
 
             elif upload_type=='topo':
-                date = datetime.datetime.today()
+                self.date = dt.today()
                 cleaned_date = "".join([c for c in date.isoformat() if c not in ':-'])[:-2]
                 bname = bname.split(".")[0] + "_{}.nc".format(cleaned_date)
                 fname = bname
@@ -309,7 +310,7 @@ class AWSM_Geoserver(object):
 
             rjson = self.make('workspaces', payload)
 
-    def create_coveragestore(self, basin, store, filename):
+    def create_coveragestore(self, basin, store, filename, description=None):
         """
         Creates a coverage data store for raster type data on the geoserver.
 
@@ -324,28 +325,31 @@ class AWSM_Geoserver(object):
         # Check to see if the store already exists...
         if self.exists(basin, store=store):
             self.log.info("Coverage store {} exists...".format(store))
-
-        resource = 'workspaces/{}/coveragestores.json'.format(basin)
-
-        payload = {"coverageStore":{"name":store,
-                                    "type":"NetCDF",
-                                    "enabled":True,
-                                    "_default":False,
-                                    "workspace":{"name": basin},
-                                    "configure":"all",
-                                    "url":"file:basins/{}/{}".format(basin, bname)}}
-
-        create_cs = ask_user("You are about to create a new geoserver"
-                             " coverage store called: {} in the {}\n Are "
-                             " you sure you want to continue?"
-                             "".format(store, basin))
-        if not create_cs:
-            self.log.info("Aborting creating a new coverage store. Exiting...")
             sys.exit()
         else:
-            self.log.info("Creating a new coverage on geoserver...")
-            self.log.debug(payload)
-            rjson = self.make(resource, payload)
+            resource = 'workspaces/{}/coveragestores.json'.format(basin)
+
+            payload = {"coverageStore":{"name":store,
+                                        "type":"NetCDF",
+                                        "enabled":True,
+                                        "_default":False,
+                                        "workspace":{"name": basin},
+                                        "configure":"all",
+                                        "url":"file:basins/{}/{}".format(basin, bname)}}
+            if description != None:
+                payload['coverageStore']["description"] = description
+
+            create_cs = ask_user("You are about to create a new geoserver"
+                                 " coverage store called: {} in the {}\n Are "
+                                 " you sure you want to continue?"
+                                 "".format(store, basin))
+            if not create_cs:
+                self.log.info("Aborting creating a new coverage store. Exiting...")
+                sys.exit()
+            else:
+                self.log.info("Creating a new coverage on geoserver...")
+                self.log.debug(payload)
+                rjson = self.make(resource, payload)
 
     def create_layer(self, basin, store, layer):
         """
@@ -361,11 +365,11 @@ class AWSM_Geoserver(object):
                    "".format(basin, store))
 
         title = ("{} {}".format(basin, layer)).replace("_"," ").title()
-        lyr_name = layer.lower().replace(" ","_")
+        lyr_name = layer.lower().replace(" ","_").replace('-','')
 
         payload = {"coverage":{"name":lyr_name,
                                "nativeName":lyr_name,
-                               "nativeCoverageName":layer.replace(" ", "_"),
+                               "nativeCoverageName":layer.split(' ')[0],
                                "store":{"name": "{}:{}".format(basin, store)},
                                "enabled":True,
                                "title":title
@@ -374,7 +378,7 @@ class AWSM_Geoserver(object):
         self.log.debug("Payload: {}".format(payload))
         response = self.make(resource, payload)
 
-    def create_layers_from_netcdf(self, basin, store, layers=None, date=None):
+    def create_layers_from_netcdf(self, basin, store, layers=None):
         """
         Opens a netcdf locally and adds all layers to the geoserver that are in
         the entire image if layers = None otherwise adds only the layers listed.
@@ -387,8 +391,8 @@ class AWSM_Geoserver(object):
         """
 
         for name in layers:
-            if date != None:
-                name = name+date
+            if hasattr(self,'date'):
+                name = "{} {}".format(name, self.date.isoformat().split('T')[0])
 
             if self.exists(basin, store, name):
                 self.log.info("Layer {} from store {} in the {} exists..."
@@ -471,8 +475,10 @@ class AWSM_Geoserver(object):
         """
         # Always call store names the same thing, <basin>_topo
         store_name = "{}_topo".format(basin)
-
-        self.create_coveragestore(basin, store_name, filename)
+        description = ("NetCDF file containing topographic images required for "
+                       "modeling the {} watershed in AWSM.\n"
+                       "Uploaded: {}").format(basin, self.date)
+        self.create_coveragestore(basin, store_name, filename, description=description)
 
         self.create_layers_from_netcdf(filename, basin, store_name,
                                                  layers=layers)
@@ -495,7 +501,15 @@ class AWSM_Geoserver(object):
         store_name = "{}_{}".format(basin,
                                     os.path.basename(filename).split(".")[0])
         # Create Netcdf store
-        self.create_coveragestore(basin, store_name, filename)
+        description = ("NetCDF file containing modeled snowpack images from "
+                       "the {} watershed produced by AWSM.\n"
+                       "Model Date: {}"
+                       "Date Uploaded: {}").format(basin,
+                                       self.date,
+                                       dt.today().isoformat().split('T'))
+
+        self.create_coveragestore(basin, store_name, filename,
+                                                     description=description)
 
         # Create layers density, specific mass, thickness
         self.create_layers_from_netcdf(basin, store_name, layers=layers)
