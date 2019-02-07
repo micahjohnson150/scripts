@@ -48,6 +48,11 @@ class AWSM_Geoserver(object):
         self.pem = cred['pem']
         self.data = cred['data']
 
+        # Names we want to remap
+        self.remap = {'snow_density':'density',
+                      'specific_mass':'SWE',
+                      'thickness':'depth'}
+
 
     def make(self, resource, payload):
         """
@@ -124,8 +129,9 @@ class AWSM_Geoserver(object):
                 self.log.info("Retrieving date from netcdf...")
                 time = ds.variables['time']
                 dates = num2date(time[:], units=time.units, calendar=time.calendar)
-                self.date = dates[0]
-                cleaned_date = "".join([c for c in self.date.isoformat() if c not in ':-'])[:-2]
+                self.date = dates[0].isoformat().split('T')[0]
+
+                cleaned_date = "".join([c for c in self.date if c not in ':-'])[:-2]
                 bname = bname.split(".")[0] + "_{}.nc".format(cleaned_date)
                 fname = bname
 
@@ -138,7 +144,7 @@ class AWSM_Geoserver(object):
                 mask_exlcude = []
 
             elif upload_type=='topo':
-                self.date = dt.today()
+                self.date = dt.today().isoformat().split('T')[0]
                 cleaned_date = "".join([c for c in date.isoformat() if c not in ':-'])[:-2]
                 bname = bname.split(".")[0] + "_{}.nc".format(cleaned_date)
                 fname = bname
@@ -364,12 +370,29 @@ class AWSM_Geoserver(object):
         resource = ("workspaces/{}/coveragestores/{}/coverages.json"
                    "".format(basin, store))
 
-        title = ("{} {}".format(basin, layer)).replace("_"," ").title()
+        native_name = layer.replace('_',' ')
+
+        # Rename the isnobal stuff
+        if native_name in ['snow_density','specific_mass','thickness']:
+            name = self.remap[native_name]
+        else:
+            name = lyr_name
+
+        # Human readable title for geoserver UI
+
+        title = ("{} {} {}".format(basin,
+                                   self.date,
+                                   name)).replace("_"," ").title()
+
+        # Add an associated Date to the layer
+        if hasattr(self,'date'):
+            name = "{} {}".format(name, self.date)
+
         lyr_name = layer.lower().replace(" ","_").replace('-','')
 
-        payload = {"coverage":{"name":lyr_name,
+        payload = {"coverage":{"name":name,
                                "nativeName":lyr_name,
-                               "nativeCoverageName":layer.split(' ')[0],
+                               "nativeCoverageName":native_name,
                                "store":{"name": "{}:{}".format(basin, store)},
                                "enabled":True,
                                "title":title
@@ -391,12 +414,11 @@ class AWSM_Geoserver(object):
         """
 
         for name in layers:
-            if hasattr(self,'date'):
-                name = "{} {}".format(name, self.date.isoformat().split('T')[0])
 
             if self.exists(basin, store, name):
                 self.log.info("Layer {} from store {} in the {} exists..."
                       "".format(name, store, basin))
+                self.log.warning("Skipping layer {} to geoserver.".format(name))
             else:
                 self.log.info("Adding {} from {} to the {}".format(name,
                                                            store,
