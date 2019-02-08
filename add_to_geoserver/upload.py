@@ -13,6 +13,7 @@ import certifi
 from spatialnc.proj import add_proj
 from spatialnc.utilities import copy_nc, mask_nc
 from datetime import datetime as dt
+import numpy as np
 
 __version__ = '0.1.0'
 
@@ -52,6 +53,14 @@ class AWSM_Geoserver(object):
         self.remap = {'snow_density':'density',
                       'specific_mass':'SWE',
                       'thickness':'depth'}
+
+        # Auto assign layers to colormaps
+        self.colormaps = {"dynamic_default":["depth","density","swe", "dem",
+                                             "veg_tau","veg_k","veg_type",
+                                             "veg_height"],
+                          "mask":["mask"],}
+        #  Manage the ranges
+        self.ranges = {}
 
 
     def make(self, resource, payload):
@@ -150,17 +159,20 @@ class AWSM_Geoserver(object):
                 fname = bname
                 mask_exlcude = ['mask']
 
-            # Create a copy nad mask
+            # Create a copy
             self.log.info("Copying netcdf...")
             new_ds = copy_nc(ds, fname, exclude = exclude_vars)
-            new_ds.close()
 
-            self.log.info("Masking netcdf using {}...".format(mask))
-            if mask == None:
-                self.log.error("Please provide a netcdf containing a mask.")
-                sys.exit()
+            # Calculate mins and maxes
+            for lyr in [l for l in keep_vars if l not in ['x','y','time','projection']]:
+                self.ranges[lyr] = [np.min(new_ds.variables[lyr][:]),
+                                    np.max(new_ds.variables[lyr][:])]
 
-            new_ds = mask_nc(fname, mask, exclude=mask_exlcude)
+            # Optional Masking
+            if mask != None:
+                self.log.info("Masking netcdf using {}...".format(mask))
+                new_ds.close() # close the last one
+                new_ds = mask_nc(fname, mask, exclude=mask_exlcude)
 
             # Check for missing projection
             if 'projection' not in new_ds.variables:
@@ -293,6 +305,20 @@ class AWSM_Geoserver(object):
             self.log.debug("{} doesn't exist on the geoserver.".format(msg))
             return False
 
+    def set_publishing(self, layer, max_val, min_val):
+        """
+        Sets the layer styles and band limits
+
+        Args:
+            layer: name of the layer to add to
+            max_val: max value to use on the band
+            min_val: min value to use on the band
+
+        """
+        payload = {"layer":{"name":layer,
+                   "type":"RASTER","defaultStyle":{"name":style},
+                   "attribution":{"logoWidth":0,"logoHeight":0}}}
+
     def create_basin(self, basin):
         """
         Creates a new basin on the geoserver. Important to note that this script
@@ -330,7 +356,7 @@ class AWSM_Geoserver(object):
 
         # Check to see if the store already exists...
         if self.exists(basin, store=store):
-            self.log.info("Coverage store {} exists...".format(store))
+            self.log.error("Coverage store {} exists! Either remove it from the geoserver or rename your files.".format(store))
             sys.exit()
         else:
             resource = 'workspaces/{}/coveragestores.json'.format(basin)
@@ -370,38 +396,61 @@ class AWSM_Geoserver(object):
         resource = ("workspaces/{}/coveragestores/{}/coverages.json"
                    "".format(basin, store))
 
-        native_name = layer.replace('_',' ')
-
         # Rename the isnobal stuff
+        lyr_name = layer#.lower().replace(" ","_").replace('-','')
+        native_name = lyr_name#layer.replace('_',' ')
+
+        # Make the names better
         if native_name in ['snow_density','specific_mass','thickness']:
             name = self.remap[native_name]
         else:
             name = lyr_name
 
         # Human readable title for geoserver UI
-
-        title = ("{} {} {}".format(basin,
-                                   self.date,
-                                   name)).replace("_"," ").title()
+        if name.lower() == 'swe':
+            title = ("{} {} {}".format(basin.title(),
+                                       self.date,
+                                       name.upper())).replace("_"," ")
+        else:
+            title = ("{} {} {}".format(basin,
+                                       self.date,
+                                       name)).replace("_"," ").title()
 
         # Add an associated Date to the layer
         if hasattr(self,'date'):
-            name = "{} {}".format(name, self.date)
+            name = "{}{}".format(name, self.date.replace('-',''))
 
-        lyr_name = layer.lower().replace(" ","_").replace('-','')
+        # Assign Colormaps
+        colormap = self.assign_cmap(name)
 
         payload = {"coverage":{"name":name,
                                "nativeName":lyr_name,
                                "nativeCoverageName":native_name,
                                "store":{"name": "{}:{}".format(basin, store)},
                                "enabled":True,
-                               "title":title
-                                }
-                            }
+                               "title":title}}
+
+        # If we have ranges for the layer, use it.
+        # if lyr_name in self.ranges.keys():
+        #     self.log.info("Adding range for the image...")
+        #     payload["coverage"]["dimensions"] = {"coverageDimension":[
+        #                                                     {"name":"{}".format(name),
+        #                                                      "range":{"min":"{}".format(self.ranges[lyr_name][0]),
+        #                                                               "max":"{}".format(self.ranges[lyr_name][1])},
+        #                                                       }]
+        #                                         }
+
+
         self.log.debug("Payload: {}".format(payload))
         response = self.make(resource, payload)
 
-    def create_layers_from_netcdf(self, basin, store, layers=None):
+        # Now edit the layer
+        #resource = ("layers/{}:{}.json"
+        #           "".format(basin, name))
+        #rjson = self.get(resource)
+
+
+    def create_layers_from_netcdf(self, basin, store, filename, layers=None,):
         """
         Opens a netcdf locally and adds all layers to the geoserver that are in
         the entire image if layers = None otherwise adds only the layers listed.
@@ -502,8 +551,7 @@ class AWSM_Geoserver(object):
                        "Uploaded: {}").format(basin, self.date)
         self.create_coveragestore(basin, store_name, filename, description=description)
 
-        self.create_layers_from_netcdf(filename, basin, store_name,
-                                                 layers=layers)
+        self.create_layers_from_netcdf(basin, store_name, filename, layers=layers)
 
     def submit_modeled(self, filename, basin, layers=None):
         """
@@ -528,13 +576,29 @@ class AWSM_Geoserver(object):
                        "Model Date: {}"
                        "Date Uploaded: {}").format(basin,
                                        self.date,
-                                       dt.today().isoformat().split('T'))
+                                       dt.today().isoformat().split('T')[0])
 
         self.create_coveragestore(basin, store_name, filename,
                                                      description=description)
 
         # Create layers density, specific mass, thickness
-        self.create_layers_from_netcdf(basin, store_name, layers=layers)
+
+        self.create_layers_from_netcdf(basin, store_name, filename, layers=layers)
+
+    def assign_cmap(self, name):
+        """
+        Uses attributes from class to determine is a layer name is associated
+        to a colormap
+        """
+        for cmap,layer_list in self.colormaps.items():
+            for layer in layer_list:
+                if name.lower() in layer:
+                    return cmap
+
+        self.log.warning(("Layer {} does not have an assigned colormap, "
+                        "using default").format(name))
+        return "dynamic_default"
+
 
 
 def ask_user(msg):
