@@ -430,15 +430,15 @@ class AWSM_Geoserver(object):
                                "enabled":True,
                                "title":title}}
 
-        # If we have ranges for the layer, use it.
-        # if lyr_name in self.ranges.keys():
-        #     self.log.info("Adding range for the image...")
-        #     payload["coverage"]["dimensions"] = {"coverageDimension":[
-        #                                                     {"name":"{}".format(name),
-        #                                                      "range":{"min":"{}".format(self.ranges[lyr_name][0]),
-        #                                                               "max":"{}".format(self.ranges[lyr_name][1])},
-        #                                                       }]
-        #                                         }
+        #If we have ranges for the layer, use it.
+        if lyr_name in self.ranges.keys():
+            self.log.info("Adding range for the image...")
+            payload["coverage"]["dimensions"] = {"coverageDimension":[
+                                                            {"name":"{}".format(name),
+                                                             "range":{"min":"{}".format(self.ranges[lyr_name][0]),
+                                                                      "max":"{}".format(self.ranges[lyr_name][1])},
+                                                              }]
+                                                }
 
 
         self.log.debug("Payload: {}".format(payload))
