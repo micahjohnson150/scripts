@@ -87,6 +87,30 @@ class AWSM_Geoserver(object):
         )
         return r.raise_for_status()
 
+    def modify(self, resource, payload):
+        """
+        Wrapper for post request.
+
+        Args:
+            resource: Relative location from the http root
+            payload: Dictionary containing data to transfer.
+
+        Returns:
+            string: request status
+        """
+
+        headers = {'content-type' : 'application/json'}
+        request_url = urljoin(self.url, resource)
+        self.log.debug("PUT request to {}".format(request_url))
+        r = requests.put(
+            request_url,
+            headers=headers,
+            data=json.dumps(payload),
+            verify=False,
+            auth=self.credential
+        )
+        return r.raise_for_status()
+
     def get(self, resource):
         """
         Wrapper for requests.get function.
@@ -140,7 +164,7 @@ class AWSM_Geoserver(object):
                 dates = num2date(time[:], units=time.units, calendar=time.calendar)
                 self.date = dates[0].isoformat().split('T')[0]
 
-                cleaned_date = "".join([c for c in self.date if c not in ':-'])[:-2]
+                cleaned_date = "".join([c for c in self.date if c not in ':-'])
                 bname = bname.split(".")[0] + "_{}.nc".format(cleaned_date)
                 fname = bname
 
@@ -185,7 +209,7 @@ class AWSM_Geoserver(object):
                 self.log.info("Adding projection information using ESPG code {}...".format(espg))
                 new_ds = add_proj(new_ds, espg)
 
-
+            # Clean up
             new_ds.close()
             ds.close()
 
@@ -305,20 +329,6 @@ class AWSM_Geoserver(object):
             self.log.debug("{} doesn't exist on the geoserver.".format(msg))
             return False
 
-    def set_publishing(self, layer, max_val, min_val):
-        """
-        Sets the layer styles and band limits
-
-        Args:
-            layer: name of the layer to add to
-            max_val: max value to use on the band
-            min_val: min value to use on the band
-
-        """
-        payload = {"layer":{"name":layer,
-                   "type":"RASTER","defaultStyle":{"name":style},
-                   "attribution":{"logoWidth":0,"logoHeight":0}}}
-
     def create_basin(self, basin):
         """
         Creates a new basin on the geoserver. Important to note that this script
@@ -420,9 +430,6 @@ class AWSM_Geoserver(object):
         if hasattr(self,'date'):
             name = "{}{}".format(name, self.date.replace('-',''))
 
-        # Assign Colormaps
-        colormap = self.assign_cmap(name)
-
         payload = {"coverage":{"name":name,
                                "nativeName":lyr_name,
                                "nativeCoverageName":native_name,
@@ -439,15 +446,29 @@ class AWSM_Geoserver(object):
                                                                       "max":"{}".format(self.ranges[lyr_name][1])},
                                                               }]
                                                 }
-
-
+        # submit the payload for creating a new coverage
         self.log.debug("Payload: {}".format(payload))
         response = self.make(resource, payload)
 
-        # Now edit the layer
-        #resource = ("layers/{}:{}.json"
-        #           "".format(basin, name))
-        #rjson = self.get(resource)
+        # Check if the GWC exists
+        #response = self.get("http://snow.scinet.science/geoserver/gwc/rest/layers/
+
+        # Assign Colormaps
+        colormap = self.assign_cmap(name)
+        resource = ("layers/{}:{}/styles.json".format(basin, name))
+        rjson = self.get(resource)
+
+        rjson["styles"] = {"@class":"linked-hash-set","style":[{"name":colormap}]}
+
+        # self.log.info("Assigning {} colormap.".format(colormap))
+        # href = "{}styles/{}.json".format(self.url, colormap)
+        # #rjson["layer"]["defaultStyle"] = {"name":colormap}
+        # #rjson["layer"]["styles" = {"@class":"linked-hash-set","style":[{"name":colormap,"href":href}]}
+        # print(rjson)
+        # rjson = self.make(,rjson)
+        # print(rjson)
+        # rjson = self.get(resource)
+        # print(rjson)
 
 
     def create_layers_from_netcdf(self, basin, store, filename, layers=None,):
