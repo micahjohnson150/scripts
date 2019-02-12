@@ -39,14 +39,17 @@ class AWSM_Geoserver(object):
         with open(fname) as fp:
             cred = json.load(fp)
             fp.close()
-        self.password = cred['password']
-        self.username = cred['username']
+        self.geoserver_password = cred['geoserver_password']
+        self.geoserver_username = cred['geoserver_username']
         self.url = urljoin(cred['url'], 'rest/')
-
+        self.username = cred['remote_user']
         # Extract the base url
         self.base_url = urlparse(self.url).netloc
-        self.credential = (self.username, self.password)
-        self.pem = cred['pem']
+        self.credential = (self.geoserver_username, self.geoserver_password)
+
+        if 'pem' in cred.keys():
+            self.pem = cred['pem']
+
         self.data = cred['data']
 
         # Names we want to remap
@@ -85,11 +88,13 @@ class AWSM_Geoserver(object):
             verify=False,
             auth=self.credential
         )
-        return r.raise_for_status()
+        result = r.raise_for_status()
+        self.log.debug("POST request returns {}:".format(result))
+        return result
 
-    def modify(self, resource, payload):
+    def delete(self, resource):
         """
-        Wrapper for post request.
+        Wrapper for delete request.
 
         Args:
             resource: Relative location from the http root
@@ -99,16 +104,41 @@ class AWSM_Geoserver(object):
             string: request status
         """
 
-        headers = {'content-type' : 'application/json'}
+        headers = {'content-type':'application/json'}
+        request_url = urljoin(self.url, resource)
+        self.log.debug("PUT request to {}".format(request_url))
+        r = requests.delete(
+            request_url,
+            headers=headers,
+            verify=False,
+            auth=self.credential
+        )
+        self.log.debug("Response from DELETE: {}".format(r))
+        return r.raise_for_status()
+
+    def modify(self, resource, payload):
+        """
+        Wrapper for Put request.
+
+        Args:
+            resource: Relative location from the http root
+            payload: Dictionary containing data to transfer.
+
+        Returns:
+            string: request status
+        """
+
+        headers = {'accept':'application/json',
+                   'content-type':'application/json'}
         request_url = urljoin(self.url, resource)
         self.log.debug("PUT request to {}".format(request_url))
         r = requests.put(
             request_url,
             headers=headers,
-            data=json.dumps(payload),
-            verify=False,
+            json=payload,
             auth=self.credential
         )
+        self.log.debug("Response from PUT: {}".format(r))
         return r.raise_for_status()
 
     def get(self, resource):
@@ -134,7 +164,9 @@ class AWSM_Geoserver(object):
             headers=headers,
             auth=self.credential
         )
-        return r.json()
+        result = r.json()
+        self.log.debug("GET Returns: {}".format(result))
+        return result
 
     def extract_data(self, fname, upload_type='modeled', espg=None, mask=None):
         """
@@ -235,11 +267,22 @@ class AWSM_Geoserver(object):
         self.log.info("Copying local data to remote, this may take a couple "
                       "minutes...")
         self.log.debug("SCP info:{} -----> {}".format(bname, final_fname))
-        s = check_output(["scp", "-i", self.pem, fname, "ubuntu@{}:{}".format(
-                                                            self.base_url,
-                                                            final_fname)],
-                                                            shell=False,
-                                                            universal_newlines=True)
+
+        # Form the SCP command, handle if there is no pem file
+        cmd = ["scp"]
+
+        if hasattr(self,"pem"):
+            cmd.append("-i")
+            cmd.append(self.pem)
+
+        cmd.append(fname)
+        cmd.append("{}@{}:{}".format(self.username, self.base_url, final_fname))
+
+        try:
+            s = check_output(cmd, shell=False, universal_newlines=True)
+        except Exception as e:
+            self.log.error(e)
+            copyfile(fname,final_fname)
 
         return final_fname
 
@@ -366,8 +409,11 @@ class AWSM_Geoserver(object):
 
         # Check to see if the store already exists...
         if self.exists(basin, store=store):
-            self.log.error("Coverage store {} exists! Either remove it from the geoserver or rename your files.".format(store))
+            self.log.error("Coverage store {} exists!".format(store))
             sys.exit()
+            #resource = 'workspaces/{}/coveragestores/{}'.format(basin,store)
+
+            #self.delete(resource)
         else:
             resource = 'workspaces/{}/coveragestores.json'.format(basin)
 
@@ -430,12 +476,14 @@ class AWSM_Geoserver(object):
         if hasattr(self,'date'):
             name = "{}{}".format(name, self.date.replace('-',''))
 
+        colormap = self.assign_cmap(name)
         payload = {"coverage":{"name":name,
                                "nativeName":lyr_name,
                                "nativeCoverageName":native_name,
                                "store":{"name": "{}:{}".format(basin, store)},
                                "enabled":True,
-                               "title":title}}
+                               "title":title,
+                               }}
 
         #If we have ranges for the layer, use it.
         if lyr_name in self.ranges.keys():
@@ -450,25 +498,28 @@ class AWSM_Geoserver(object):
         self.log.debug("Payload: {}".format(payload))
         response = self.make(resource, payload)
 
-        # Check if the GWC exists
-        #response = self.get("http://snow.scinet.science/geoserver/gwc/rest/layers/
-
         # Assign Colormaps
         colormap = self.assign_cmap(name)
-        resource = ("layers/{}:{}/styles.json".format(basin, name))
+        resource = ("layers/{}:{}".format(basin, name))
+
+        # Get the automated layer
         rjson = self.get(resource)
 
-        rjson["styles"] = {"@class":"linked-hash-set","style":[{"name":colormap}]}
+        self.log.info("Assigning {} colormap.".format(colormap))
+        rjson["layer"]["defaultStyle"] = {"name": colormap}
+        rjson["layer"]["opaque"] = True
 
-        # self.log.info("Assigning {} colormap.".format(colormap))
-        # href = "{}styles/{}.json".format(self.url, colormap)
-        # #rjson["layer"]["defaultStyle"] = {"name":colormap}
-        # #rjson["layer"]["styles" = {"@class":"linked-hash-set","style":[{"name":colormap,"href":href}]}
-        # print(rjson)
-        # rjson = self.make(,rjson)
-        # print(rjson)
-        # rjson = self.get(resource)
-        # print(rjson)
+        payload = {"layer":{"defaultStyle":{"name": "dynamic_default"}}}
+
+        #r = self.modify(resource,payload)
+
+        cmd = ["curl","-u","{}:{}".format(self.geoserver_username, self.geoserver_password),
+               "-XPUT", "-H", '"accept:text/xml"', "-H",'"content-type:text/xml"',
+               urljoin(self.url,resource+'.xml'), "-d",'"<layer><defaultStyle><name>{}</name></defaultStyle></layer>"'.format(colormap),
+               "-v"]
+        self.log.debug("Executing hack:\n{}".format(" ".join(cmd)))
+        s = check_output(" ".join(cmd), shell=True, universal_newlines=True)
+        rjson = self.get(resource)
 
 
     def create_layers_from_netcdf(self, basin, store, filename, layers=None,):
