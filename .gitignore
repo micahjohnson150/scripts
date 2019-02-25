@@ -3,4 +3,4 @@
 *.aux*
 */*.tif*
 */__pycache__
-
+*/tmp/*

@@ -7,7 +7,7 @@ import re
 
 def strip_chars(edit_str, bad_chars='[(){}<>,"_]=\nns'):
     result = ''.join([s for s in edit_str if s not in bad_chars])
-    print(result)
+
     return result
 
 
@@ -110,7 +110,7 @@ def add_proj(nc_obj,epsg):
 
         # Assume all 2D+ vars are the same projection
         if 'x' in var.dimensions and 'y' in var.dimensions:
-            print("Adding Coordinate System info to {0}".format(name))
+            #print("Adding Coordinate System info to {0}".format(name))
             nc_obj[name].setncatts({"grid_mapping":"projection"})
 
         elif name.lower() in ['x','y']:
