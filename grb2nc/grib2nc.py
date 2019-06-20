@@ -58,8 +58,9 @@ def grib2nc(f_hrrr, output=None, external_logger=None):
 	            },
 	        }
 
+	# No output file name used, use the original plus a new extension
 	if output == None:
-		output = "".join(os.path.basename(f_hrrr).split(".")[0:-1]) + ".nc"
+		output = ".".join(os.path.basename(f_hrrr).split(".")[0:-1]) + ".nc"
 
 	grib_vars = ""
 	var_count = 0
@@ -79,12 +80,14 @@ def grib2nc(f_hrrr, output=None, external_logger=None):
 
 		# Check if we only identify one variable based on line returns
 		return_count = len([True for c in s if c == '\n'])
+
 		if return_count != 1:
 			log.warning("Found multiple variable entries for keywords "
 						"associated with {}".format(k))
 			var_count += return_count
 		else:
 			var_count += 1
+		# Add the grib var name to our running string/list
 		grib_vars += s
 
 	log.info("Extracting {} variables and converting to netcdf...".format(var_count))

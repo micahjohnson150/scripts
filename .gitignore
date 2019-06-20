@@ -1,6 +1,13 @@
 */*.nc
-/add_to_geoserver/*_subbasin.*
 *.aux*
 */*.tif*
 */__pycache__
 */tmp/*
+*.json
+
+/add_to_geoserver/*_subbasin.*
+/add_to_geoserver/*.sld
+/add_to_geoserver/inputs/*
+*.grib2
+/routing/examples/*
+
