@@ -1,0 +1,13 @@
+##############################################################
+ Basin Catchment File for USDA-ARS-NWRC Streamflow modeling. 
+ Delineatation Threshold: 100000
+ Date Created: 2019-05-29
+ Created using basin_setup v0.8.2
+##############################################################
+
+DN,area,downstream
+1,10604900.0,7
+3,13990900.0,9
+5,23500300.0,7
+7,251700.0,9
+9,6337700.0,-1
