@@ -1,6 +1,11 @@
 from make_all_topos import find_basin_paths
 import os
 
+"""
+Copies a file to all the basin folders, Originally designed for docker-compose
+files
+"""
+
 basins_dir = "~/projects/basins"
 copy_file = "~/projects/basins/docker-compose.yml"
 

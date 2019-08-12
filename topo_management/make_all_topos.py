@@ -3,6 +3,16 @@ from os.path import isfile, isdir, basename, abspath, expanduser, split
 from subprocess import check_output, Popen
 import sys
 
+"""
+Every basin in my basin folder has a make file and each is constructed simiarly.
+Thie script will go through all the basin topos with a make file and execute
+make < arg >
+
+e.g.
+    python make_all_topos.py topo - is equivalent to going to each basin and make topo
+
+"""
+
 def find_basin_paths(directory, indicator_folder="model_setup", indicator_file="Makefile"):
     """
     Walks through all the folder in directory looking for a directory called
@@ -32,7 +42,6 @@ if __name__ == "__main__":
 
     count = 0
     basins_attempted = 0
-    failures = 0
 
 
     print("Looking in {} for basins with makefiles...".format(basins_dir))
@@ -51,8 +60,6 @@ if __name__ == "__main__":
 
         if topo_attempt:
             basins_attempted += 1
-        else:
-            failures +=1
+
         #input("press enter to continue")
-    print("Attempted to build {} topos".format(basins_attempted + failures))
-    print("Failed to build {} topos".format(failures))
+    print("Attempted to build {} topos".format(basins_attempted))
