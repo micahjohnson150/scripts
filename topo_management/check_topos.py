@@ -90,6 +90,7 @@ if __name__ == "__main__":
 
                     #if ops_type != dev_type:
                     print("\t\tVariable {}: Dev type = {}, Ops type = {}".format(vz, dev_type, ops_type))
+
         if problems_prev != problems:
             basin_problems += 1
 
