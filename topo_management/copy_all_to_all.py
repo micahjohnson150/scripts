@@ -16,7 +16,12 @@ final_basins_dir = "~/projects/basin_ops"
 exp_basins_dir = os.path.expanduser(exp_basins_dir)
 final_basins_dir = os.path.expanduser(final_basins_dir)
 
-from_paths = find_basin_paths(exp_basins_dir, indicator_folder="model_setup",
+if fname == "topo.nc":
+    indicator_folder = "basin_setup"
+else:
+    indicator_folder = "model_setup"
+
+from_paths = find_basin_paths(exp_basins_dir, indicator_folder=indicator_folder,
                                      indicator_file=fname)
 to_paths = find_basin_paths(final_basins_dir, indicator_folder="topo",
                                      indicator_file="topo.nc")
