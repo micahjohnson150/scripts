@@ -10,4 +10,12 @@
 /add_to_geoserver/inputs/*
 *.grib2
 /routing/examples/*
-
+/boehm_box/*.shp
+/boehm_box/*.dbf
+/boehm_box/*.prj
+/boehm_box/*.zip
+/boehm_box/*.sbn
+/boehm_box/*.cpg
+/boehm_box/*.xml
+/boehm_box/*.shx
+/boehm_box/*.sbx
