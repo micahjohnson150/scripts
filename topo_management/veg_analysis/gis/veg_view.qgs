@@ -1,0 +1,698 @@
+<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+<qgis projectname="" version="2.18.28">
+  <title></title>
+  <autotransaction active="0"/>
+  <evaluateDefaultValues active="0"/>
+  <layer-tree-group expanded="1" checked="Qt::Checked" name="">
+    <customproperties/>
+    <layer-tree-layer expanded="0" providerKey="gdal" checked="Qt::Checked" id="sanjoaquin_topo20191218155459897" source="/home/micahjohnson/projects/basins/california/analysis/new_veg_k_tau/veg_masks/sanjoaquin_topo.nc" name="sanjoaquin_topo">
+      <customproperties/>
+    </layer-tree-layer>
+    <layer-tree-layer expanded="0" providerKey="gdal" checked="Qt::Checked" id="kings_topo20191218155457803" source="/home/micahjohnson/projects/basins/california/analysis/new_veg_k_tau/veg_masks/kings_topo.nc" name="kings_topo">
+      <customproperties/>
+    </layer-tree-layer>
+    <layer-tree-layer expanded="0" providerKey="gdal" checked="Qt::Checked" id="don_pedro_topo20191218155455985" source="/home/micahjohnson/projects/basins/california/analysis/new_veg_k_tau/veg_masks/don_pedro_topo.nc" name="don_pedro_topo">
+      <customproperties/>
+    </layer-tree-layer>
+    <layer-tree-layer expanded="1" providerKey="" checked="Qt::Checked" id="OpenLayers_plugin_layer20191218152730121" source="/home/micahjohnson/projects/basins/california/analysis/new_veg_k_tau/gis" name="Bing Aerial">
+      <customproperties/>
+    </layer-tree-layer>
+  </layer-tree-group>
+  <relations/>
+  <mapcanvas>
+    <units>meters</units>
+    <extent>
+      <xmin>5491.96800713130505756</xmin>
+      <ymin>3986022.71632329560816288</ymin>
+      <xmax>480511.96800713130505756</xmax>
+      <ymax>4294722.71632329653948545</ymax>
+    </extent>
+    <rotation>0</rotation>
+    <projections>1</projections>
+    <destinationsrs>
+      <spatialrefsys>
+        <proj4>+proj=utm +zone=11 +datum=WGS84 +units=m +no_defs</proj4>
+        <srsid>3095</srsid>
+        <srid>32611</srid>
+        <authid>EPSG:32611</authid>
+        <description>WGS 84 / UTM zone 11N</description>
+        <projectionacronym>utm</projectionacronym>
+        <ellipsoidacronym>WGS84</ellipsoidacronym>
+        <geographicflag>false</geographicflag>
+      </spatialrefsys>
+    </destinationsrs>
+    <rendermaptile>0</rendermaptile>
+    <layer_coordinate_transform_info/>
+  </mapcanvas>
+  <layer-tree-canvas>
+    <custom-order enabled="0">
+      <item>OpenLayers_plugin_layer20191218152730121</item>
+      <item>don_pedro_topo20191218155455985</item>
+      <item>kings_topo20191218155457803</item>
+      <item>sanjoaquin_topo20191218155459897</item>
+    </custom-order>
+  </layer-tree-canvas>
+  <legend updateDrawingOrder="true">
+    <legendlayer drawingOrder="-1" open="false" checked="Qt::Checked" name="sanjoaquin_topo" showFeatureCount="0">
+      <filegroup open="false" hidden="false">
+        <legendlayerfile isInOverview="0" layerid="sanjoaquin_topo20191218155459897" visible="1"/>
+      </filegroup>
+    </legendlayer>
+    <legendlayer drawingOrder="-1" open="false" checked="Qt::Checked" name="kings_topo" showFeatureCount="0">
+      <filegroup open="false" hidden="false">
+        <legendlayerfile isInOverview="0" layerid="kings_topo20191218155457803" visible="1"/>
+      </filegroup>
+    </legendlayer>
+    <legendlayer drawingOrder="-1" open="false" checked="Qt::Checked" name="don_pedro_topo" showFeatureCount="0">
+      <filegroup open="false" hidden="false">
+        <legendlayerfile isInOverview="0" layerid="don_pedro_topo20191218155455985" visible="1"/>
+      </filegroup>
+    </legendlayer>
+    <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="Bing Aerial" showFeatureCount="0">
+      <filegroup open="true" hidden="false">
+        <legendlayerfile isInOverview="0" layerid="OpenLayers_plugin_layer20191218152730121" visible="1"/>
+      </filegroup>
+    </legendlayer>
+  </legend>
+  <projectlayers>
+    <maplayer minimumScale="0" maximumScale="1e+08" type="plugin" hasScaleBasedVisibilityFlag="0" name="openlayers">
+      <extent>
+        <xmin>-20037508.33999999985098839</xmin>
+        <ymin>-20037508.33999999985098839</ymin>
+        <xmax>20037508.33999999985098839</xmax>
+        <ymax>20037508.33999999985098839</ymax>
+      </extent>
+      <id>OpenLayers_plugin_layer20191218152730121</id>
+      <datasource>.</datasource>
+      <keywordList>
+        <value></value>
+      </keywordList>
+      <layername>Bing Aerial</layername>
+      <srs>
+        <spatialrefsys>
+          <proj4>+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs</proj4>
+          <srsid>3857</srsid>
+          <srid>3857</srid>
+          <authid>EPSG:3857</authid>
+          <description>WGS 84 / Pseudo Mercator</description>
+          <projectionacronym>merc</projectionacronym>
+          <ellipsoidacronym>WGS84</ellipsoidacronym>
+          <geographicflag>false</geographicflag>
+        </spatialrefsys>
+      </srs>
+      <customproperties>
+        <property key="ol_layer_type" value="Bing Aerial"/>
+      </customproperties>
+    </maplayer>
+    <maplayer minimumScale="inf" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
+      <extent>
+        <xmin>193637.4375</xmin>
+        <ymin>4172114</ymin>
+        <xmax>306737.4375</xmax>
+        <ymax>4245614</ymax>
+      </extent>
+      <id>don_pedro_topo20191218155455985</id>
+      <datasource>../veg_masks/don_pedro_topo.nc</datasource>
+      <keywordList>
+        <value></value>
+      </keywordList>
+      <layername>don_pedro_topo</layername>
+      <srs>
+        <spatialrefsys>
+          <proj4>+proj=utm +zone=11 +datum=WGS84 +units=m +no_defs</proj4>
+          <srsid>3095</srsid>
+          <srid>32611</srid>
+          <authid>EPSG:32611</authid>
+          <description>WGS 84 / UTM zone 11N</description>
+          <projectionacronym>utm</projectionacronym>
+          <ellipsoidacronym>WGS84</ellipsoidacronym>
+          <geographicflag>false</geographicflag>
+        </spatialrefsys>
+      </srs>
+      <customproperties>
+        <property key="embeddedWidgets/count" value="0"/>
+        <property key="identify/format" value="Value"/>
+      </customproperties>
+      <provider>gdal</provider>
+      <noData>
+        <noDataList bandNo="1" useSrcNoData="1"/>
+      </noData>
+      <map-layer-style-manager current="">
+        <map-layer-style name=""/>
+      </map-layer-style-manager>
+      <pipe>
+        <rasterrenderer opacity="0.490196" alphaBand="0" classificationMax="4000" classificationMinMaxOrigin="User" band="1" classificationMin="3000" type="singlebandpseudocolor">
+          <rasterTransparency/>
+          <rastershader>
+            <colorrampshader colorRampType="EXACT" clip="0">
+              <item alpha="255" value="3001" label="3001" color="#67f539"/>
+              <item alpha="255" value="3002" label="3002" color="#f53926"/>
+              <item alpha="255" value="3006" label="3006" color="#63b6ce"/>
+              <item alpha="255" value="3011" label="3011" color="#7c896e"/>
+              <item alpha="255" value="3014" label="3014" color="#c66cf6"/>
+              <item alpha="255" value="3017" label="3017" color="#a5258f"/>
+              <item alpha="255" value="3019" label="3019" color="#29682a"/>
+              <item alpha="255" value="3020" label="3020" color="#22fe7c"/>
+              <item alpha="255" value="3027" label="3027" color="#156472"/>
+              <item alpha="255" value="3028" label="3028" color="#fe7c89"/>
+              <item alpha="255" value="3029" label="3029" color="#729dfd"/>
+              <item alpha="255" value="3030" label="3030" color="#9dfd58"/>
+              <item alpha="255" value="3031" label="3031" color="#e3f3d4"/>
+              <item alpha="255" value="3032" label="3032" color="#b4a122"/>
+              <item alpha="255" value="3033" label="3033" color="#133ca5"/>
+              <item alpha="255" value="3034" label="3034" color="#f3d424"/>
+              <item alpha="255" value="3043" label="3043" color="#462e05"/>
+              <item alpha="255" value="3044" label="3044" color="#27b4a1"/>
+              <item alpha="255" value="3057" label="3057" color="#8fc66c"/>
+              <item alpha="255" value="3058" label="3058" color="#6e462e"/>
+              <item alpha="255" value="3061" label="3061" color="#896e46"/>
+              <item alpha="255" value="3062" label="3062" color="#2ad7fd"/>
+              <item alpha="255" value="3067" label="3067" color="#604a8b"/>
+              <item alpha="255" value="3071" label="3071" color="#4a8be8"/>
+              <item alpha="255" value="3079" label="3079" color="#4acb29"/>
+              <item alpha="255" value="3080" label="3080" color="#660f4a"/>
+              <item alpha="255" value="3081" label="3081" color="#682ad7"/>
+              <item alpha="255" value="3082" label="3082" color="#81604a"/>
+              <item alpha="255" value="3087" label="3087" color="#41bd63"/>
+              <item alpha="255" value="3088" label="3088" color="#4be90a"/>
+              <item alpha="255" value="3097" label="3097" color="#3ae6bd"/>
+              <item alpha="255" value="3098" label="3098" color="#e6bd81"/>
+              <item alpha="255" value="3099" label="3099" color="#bd8160"/>
+              <item alpha="255" value="3103" label="3103" color="#5d41bd"/>
+              <item alpha="255" value="3105" label="3105" color="#8f3ae6"/>
+              <item alpha="255" value="3108" label="3108" color="#0ab2f5"/>
+              <item alpha="255" value="3114" label="3114" color="#d42426"/>
+              <item alpha="255" value="3124" label="3124" color="#f60f7b"/>
+              <item alpha="255" value="3125" label="3125" color="#4afe91"/>
+              <item alpha="255" value="3126" label="3126" color="#fe9166"/>
+              <item alpha="255" value="3127" label="3127" color="#0f4acb"/>
+              <item alpha="255" value="3135" label="3135" color="#fd5d41"/>
+              <item alpha="255" value="3136" label="3136" color="#8be84a"/>
+              <item alpha="255" value="3137" label="3137" color="#e84afe"/>
+              <item alpha="255" value="3138" label="3138" color="#3ca525"/>
+              <item alpha="255" value="3145" label="3145" color="#cb2968"/>
+              <item alpha="255" value="3151" label="3151" color="#4a634b"/>
+              <item alpha="255" value="3152" label="3152" color="#258f3a"/>
+              <item alpha="255" value="3153" label="3153" color="#d7fd5d"/>
+              <item alpha="255" value="3154" label="3154" color="#2e0515"/>
+              <item alpha="255" value="3164" label="3164" color="#0f7b91"/>
+              <item alpha="255" value="3181" label="3181" color="#940627"/>
+              <item alpha="255" value="3182" label="3182" color="#b6ce4a"/>
+              <item alpha="255" value="3183" label="3183" color="#062755"/>
+              <item alpha="255" value="3184" label="3184" color="#2755b6"/>
+              <item alpha="255" value="3210" label="3210" color="#6cf60f"/>
+              <item alpha="255" value="3211" label="3211" color="#e90ab2"/>
+              <item alpha="255" value="3219" label="3219" color="#392694"/>
+              <item alpha="255" value="3220" label="3220" color="#91660f"/>
+              <item alpha="255" value="3221" label="3221" color="#269406"/>
+              <item alpha="255" value="3222" label="3222" color="#b2f57e"/>
+              <item alpha="255" value="3229" label="3229" color="#a122fe"/>
+              <item alpha="255" value="3230" label="3230" color="#2426ee"/>
+              <item alpha="255" value="3231" label="3231" color="#64729d"/>
+              <item alpha="255" value="3252" label="3252" color="#7b9198"/>
+              <item alpha="255" value="3255" label="3255" color="#051564"/>
+              <item alpha="255" value="3257" label="3257" color="#634be9"/>
+              <item alpha="255" value="3260" label="3260" color="#fd58e3"/>
+              <item alpha="255" value="3261" label="3261" color="#58e3f3"/>
+              <item alpha="255" value="3264" label="3264" color="#26ee13"/>
+              <item alpha="255" value="3265" label="3265" color="#ee133c"/>
+              <item alpha="255" value="3292" label="3292" color="#3913d1"/>
+              <item alpha="255" value="3293" label="3293" color="#13d18b"/>
+              <item alpha="255" value="3294" label="3294" color="#d18b27"/>
+              <item alpha="255" value="3295" label="3295" color="#8b27b4"/>
+              <item alpha="255" value="3296" label="3296" color="#6beac3"/>
+              <item alpha="255" value="3297" label="3297" color="#544794"/>
+              <item alpha="255" value="3298" label="3298" color="#eac339"/>
+              <item alpha="255" value="3299" label="3299" color="#c33913"/>
+              <item alpha="255" value="3900" label="3900" color="#6ab9d4"/>
+              <item alpha="255" value="3901" label="3901" color="#4794c4"/>
+              <item alpha="255" value="3902" label="3902" color="#164d54"/>
+              <item alpha="255" value="3903" label="3903" color="#1c7978"/>
+              <item alpha="255" value="3904" label="3904" color="#74ed10"/>
+              <item alpha="255" value="3910" label="3910" color="#5c164d"/>
+              <item alpha="255" value="3911" label="3911" color="#94c4c1"/>
+              <item alpha="255" value="3912" label="3912" color="#d45c16"/>
+              <item alpha="255" value="3913" label="3913" color="#788229"/>
+              <item alpha="255" value="3914" label="3914" color="#10e7f2"/>
+              <item alpha="255" value="3920" label="3920" color="#b9d45c"/>
+              <item alpha="255" value="3921" label="3921" color="#c4c167"/>
+              <item alpha="255" value="3923" label="3923" color="#f28436"/>
+              <item alpha="255" value="3924" label="3924" color="#441c79"/>
+              <item alpha="255" value="3925" label="3925" color="#4d5447"/>
+              <item alpha="255" value="3926" label="3926" color="#c167f5"/>
+              <item alpha="255" value="3928" label="3928" color="#84366a"/>
+              <item alpha="255" value="3929" label="3929" color="#a574ed"/>
+              <item alpha="255" value="3943" label="3943" color="#366ab9"/>
+              <item alpha="255" value="3944" label="3944" color="#29a574"/>
+              <item alpha="255" value="3960" label="3960" color="#55b6ab"/>
+              <item alpha="255" value="3961" label="3961" color="#e7f284"/>
+              <item alpha="255" value="3964" label="3964" color="#bd63b6"/>
+              <item alpha="255" value="3965" label="3965" color="#b6aba8"/>
+              <item alpha="255" value="3966" label="3966" color="#f57e42"/>
+              <item alpha="255" value="3967" label="3967" color="#aba82e"/>
+              <item alpha="255" value="3968" label="3968" color="#797882"/>
+              <item alpha="255" value="3980" label="3980" color="#a82ed7"/>
+              <item alpha="255" value="3981" label="3981" color="#ed10e7"/>
+              <item alpha="255" value="3982" label="3982" color="#7e428f"/>
+              <item alpha="255" value="3983" label="3983" color="#428fc6"/>
+              <item alpha="255" value="3984" label="3984" color="#c5441c"/>
+              <item alpha="255" value="3985" label="3985" color="#2ed76b"/>
+              <item alpha="255" value="3986" label="3986" color="#ce4a63"/>
+              <item alpha="255" value="3987" label="3987" color="#d76bea"/>
+              <item alpha="255" value="3988" label="3988" color="#8229a5"/>
+            </colorrampshader>
+          </rastershader>
+        </rasterrenderer>
+        <brightnesscontrast brightness="0" contrast="0"/>
+        <huesaturation colorizeGreen="128" colorizeOn="0" colorizeRed="255" colorizeBlue="128" grayscaleMode="0" saturation="0" colorizeStrength="100"/>
+        <rasterresampler maxOversampling="2"/>
+      </pipe>
+      <blendMode>0</blendMode>
+    </maplayer>
+    <maplayer minimumScale="inf" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
+      <extent>
+        <xmin>283992.6875</xmin>
+        <ymin>4050545</ymin>
+        <xmax>381092.6875</xmax>
+        <ymax>4120045</ymax>
+      </extent>
+      <id>kings_topo20191218155457803</id>
+      <datasource>../veg_masks/kings_topo.nc</datasource>
+      <keywordList>
+        <value></value>
+      </keywordList>
+      <layername>kings_topo</layername>
+      <srs>
+        <spatialrefsys>
+          <proj4>+proj=utm +zone=11 +datum=WGS84 +units=m +no_defs</proj4>
+          <srsid>3095</srsid>
+          <srid>32611</srid>
+          <authid>EPSG:32611</authid>
+          <description>WGS 84 / UTM zone 11N</description>
+          <projectionacronym>utm</projectionacronym>
+          <ellipsoidacronym>WGS84</ellipsoidacronym>
+          <geographicflag>false</geographicflag>
+        </spatialrefsys>
+      </srs>
+      <customproperties>
+        <property key="embeddedWidgets/count" value="0"/>
+        <property key="identify/format" value="Value"/>
+      </customproperties>
+      <provider>gdal</provider>
+      <noData>
+        <noDataList bandNo="1" useSrcNoData="1"/>
+      </noData>
+      <map-layer-style-manager current="">
+        <map-layer-style name=""/>
+      </map-layer-style-manager>
+      <pipe>
+        <rasterrenderer opacity="0.490196" alphaBand="0" classificationMax="4000" classificationMinMaxOrigin="User" band="1" classificationMin="3000" type="singlebandpseudocolor">
+          <rasterTransparency/>
+          <rastershader>
+            <colorrampshader colorRampType="EXACT" clip="0">
+              <item alpha="255" value="3001" label="3001" color="#67f539"/>
+              <item alpha="255" value="3002" label="3002" color="#f53926"/>
+              <item alpha="255" value="3006" label="3006" color="#63b6ce"/>
+              <item alpha="255" value="3011" label="3011" color="#7c896e"/>
+              <item alpha="255" value="3014" label="3014" color="#c66cf6"/>
+              <item alpha="255" value="3017" label="3017" color="#a5258f"/>
+              <item alpha="255" value="3019" label="3019" color="#29682a"/>
+              <item alpha="255" value="3020" label="3020" color="#22fe7c"/>
+              <item alpha="255" value="3027" label="3027" color="#156472"/>
+              <item alpha="255" value="3028" label="3028" color="#fe7c89"/>
+              <item alpha="255" value="3029" label="3029" color="#729dfd"/>
+              <item alpha="255" value="3030" label="3030" color="#9dfd58"/>
+              <item alpha="255" value="3031" label="3031" color="#e3f3d4"/>
+              <item alpha="255" value="3032" label="3032" color="#b4a122"/>
+              <item alpha="255" value="3033" label="3033" color="#133ca5"/>
+              <item alpha="255" value="3034" label="3034" color="#f3d424"/>
+              <item alpha="255" value="3043" label="3043" color="#462e05"/>
+              <item alpha="255" value="3044" label="3044" color="#27b4a1"/>
+              <item alpha="255" value="3057" label="3057" color="#8fc66c"/>
+              <item alpha="255" value="3058" label="3058" color="#6e462e"/>
+              <item alpha="255" value="3061" label="3061" color="#896e46"/>
+              <item alpha="255" value="3062" label="3062" color="#2ad7fd"/>
+              <item alpha="255" value="3067" label="3067" color="#604a8b"/>
+              <item alpha="255" value="3071" label="3071" color="#4a8be8"/>
+              <item alpha="255" value="3079" label="3079" color="#4acb29"/>
+              <item alpha="255" value="3080" label="3080" color="#660f4a"/>
+              <item alpha="255" value="3081" label="3081" color="#682ad7"/>
+              <item alpha="255" value="3082" label="3082" color="#81604a"/>
+              <item alpha="255" value="3087" label="3087" color="#41bd63"/>
+              <item alpha="255" value="3088" label="3088" color="#4be90a"/>
+              <item alpha="255" value="3097" label="3097" color="#3ae6bd"/>
+              <item alpha="255" value="3098" label="3098" color="#e6bd81"/>
+              <item alpha="255" value="3099" label="3099" color="#bd8160"/>
+              <item alpha="255" value="3103" label="3103" color="#5d41bd"/>
+              <item alpha="255" value="3105" label="3105" color="#8f3ae6"/>
+              <item alpha="255" value="3108" label="3108" color="#0ab2f5"/>
+              <item alpha="255" value="3114" label="3114" color="#d42426"/>
+              <item alpha="255" value="3124" label="3124" color="#f60f7b"/>
+              <item alpha="255" value="3125" label="3125" color="#4afe91"/>
+              <item alpha="255" value="3126" label="3126" color="#fe9166"/>
+              <item alpha="255" value="3127" label="3127" color="#0f4acb"/>
+              <item alpha="255" value="3135" label="3135" color="#fd5d41"/>
+              <item alpha="255" value="3136" label="3136" color="#8be84a"/>
+              <item alpha="255" value="3137" label="3137" color="#e84afe"/>
+              <item alpha="255" value="3138" label="3138" color="#3ca525"/>
+              <item alpha="255" value="3145" label="3145" color="#cb2968"/>
+              <item alpha="255" value="3151" label="3151" color="#4a634b"/>
+              <item alpha="255" value="3152" label="3152" color="#258f3a"/>
+              <item alpha="255" value="3153" label="3153" color="#d7fd5d"/>
+              <item alpha="255" value="3154" label="3154" color="#2e0515"/>
+              <item alpha="255" value="3164" label="3164" color="#0f7b91"/>
+              <item alpha="255" value="3181" label="3181" color="#940627"/>
+              <item alpha="255" value="3182" label="3182" color="#b6ce4a"/>
+              <item alpha="255" value="3183" label="3183" color="#062755"/>
+              <item alpha="255" value="3184" label="3184" color="#2755b6"/>
+              <item alpha="255" value="3210" label="3210" color="#6cf60f"/>
+              <item alpha="255" value="3211" label="3211" color="#e90ab2"/>
+              <item alpha="255" value="3219" label="3219" color="#392694"/>
+              <item alpha="255" value="3220" label="3220" color="#91660f"/>
+              <item alpha="255" value="3221" label="3221" color="#269406"/>
+              <item alpha="255" value="3222" label="3222" color="#b2f57e"/>
+              <item alpha="255" value="3229" label="3229" color="#a122fe"/>
+              <item alpha="255" value="3230" label="3230" color="#2426ee"/>
+              <item alpha="255" value="3231" label="3231" color="#64729d"/>
+              <item alpha="255" value="3252" label="3252" color="#7b9198"/>
+              <item alpha="255" value="3255" label="3255" color="#051564"/>
+              <item alpha="255" value="3257" label="3257" color="#634be9"/>
+              <item alpha="255" value="3260" label="3260" color="#fd58e3"/>
+              <item alpha="255" value="3261" label="3261" color="#58e3f3"/>
+              <item alpha="255" value="3264" label="3264" color="#26ee13"/>
+              <item alpha="255" value="3265" label="3265" color="#ee133c"/>
+              <item alpha="255" value="3292" label="3292" color="#3913d1"/>
+              <item alpha="255" value="3293" label="3293" color="#13d18b"/>
+              <item alpha="255" value="3294" label="3294" color="#d18b27"/>
+              <item alpha="255" value="3295" label="3295" color="#8b27b4"/>
+              <item alpha="255" value="3296" label="3296" color="#6beac3"/>
+              <item alpha="255" value="3297" label="3297" color="#544794"/>
+              <item alpha="255" value="3298" label="3298" color="#eac339"/>
+              <item alpha="255" value="3299" label="3299" color="#c33913"/>
+              <item alpha="255" value="3900" label="3900" color="#6ab9d4"/>
+              <item alpha="255" value="3901" label="3901" color="#4794c4"/>
+              <item alpha="255" value="3902" label="3902" color="#164d54"/>
+              <item alpha="255" value="3903" label="3903" color="#1c7978"/>
+              <item alpha="255" value="3904" label="3904" color="#74ed10"/>
+              <item alpha="255" value="3910" label="3910" color="#5c164d"/>
+              <item alpha="255" value="3911" label="3911" color="#94c4c1"/>
+              <item alpha="255" value="3912" label="3912" color="#d45c16"/>
+              <item alpha="255" value="3913" label="3913" color="#788229"/>
+              <item alpha="255" value="3914" label="3914" color="#10e7f2"/>
+              <item alpha="255" value="3920" label="3920" color="#b9d45c"/>
+              <item alpha="255" value="3921" label="3921" color="#c4c167"/>
+              <item alpha="255" value="3923" label="3923" color="#f28436"/>
+              <item alpha="255" value="3924" label="3924" color="#441c79"/>
+              <item alpha="255" value="3925" label="3925" color="#4d5447"/>
+              <item alpha="255" value="3926" label="3926" color="#c167f5"/>
+              <item alpha="255" value="3928" label="3928" color="#84366a"/>
+              <item alpha="255" value="3929" label="3929" color="#a574ed"/>
+              <item alpha="255" value="3943" label="3943" color="#366ab9"/>
+              <item alpha="255" value="3944" label="3944" color="#29a574"/>
+              <item alpha="255" value="3960" label="3960" color="#55b6ab"/>
+              <item alpha="255" value="3961" label="3961" color="#e7f284"/>
+              <item alpha="255" value="3964" label="3964" color="#bd63b6"/>
+              <item alpha="255" value="3965" label="3965" color="#b6aba8"/>
+              <item alpha="255" value="3966" label="3966" color="#f57e42"/>
+              <item alpha="255" value="3967" label="3967" color="#aba82e"/>
+              <item alpha="255" value="3968" label="3968" color="#797882"/>
+              <item alpha="255" value="3980" label="3980" color="#a82ed7"/>
+              <item alpha="255" value="3981" label="3981" color="#ed10e7"/>
+              <item alpha="255" value="3982" label="3982" color="#7e428f"/>
+              <item alpha="255" value="3983" label="3983" color="#428fc6"/>
+              <item alpha="255" value="3984" label="3984" color="#c5441c"/>
+              <item alpha="255" value="3985" label="3985" color="#2ed76b"/>
+              <item alpha="255" value="3986" label="3986" color="#ce4a63"/>
+              <item alpha="255" value="3987" label="3987" color="#d76bea"/>
+              <item alpha="255" value="3988" label="3988" color="#8229a5"/>
+            </colorrampshader>
+          </rastershader>
+        </rasterrenderer>
+        <brightnesscontrast brightness="0" contrast="0"/>
+        <huesaturation colorizeGreen="128" colorizeOn="0" colorizeRed="255" colorizeBlue="128" grayscaleMode="0" saturation="0" colorizeStrength="100"/>
+        <rasterresampler maxOversampling="2"/>
+      </pipe>
+      <blendMode>0</blendMode>
+    </maplayer>
+    <maplayer minimumScale="inf" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
+      <extent>
+        <xmin>256625</xmin>
+        <ymin>4096625</ymin>
+        <xmax>353325</xmax>
+        <ymax>4179575</ymax>
+      </extent>
+      <id>sanjoaquin_topo20191218155459897</id>
+      <datasource>../veg_masks/sanjoaquin_topo.nc</datasource>
+      <keywordList>
+        <value></value>
+      </keywordList>
+      <layername>sanjoaquin_topo</layername>
+      <srs>
+        <spatialrefsys>
+          <proj4>+proj=utm +zone=11 +datum=WGS84 +units=m +no_defs</proj4>
+          <srsid>3095</srsid>
+          <srid>32611</srid>
+          <authid>EPSG:32611</authid>
+          <description>WGS 84 / UTM zone 11N</description>
+          <projectionacronym>utm</projectionacronym>
+          <ellipsoidacronym>WGS84</ellipsoidacronym>
+          <geographicflag>false</geographicflag>
+        </spatialrefsys>
+      </srs>
+      <customproperties>
+        <property key="embeddedWidgets/count" value="0"/>
+        <property key="identify/format" value="Value"/>
+      </customproperties>
+      <provider>gdal</provider>
+      <noData>
+        <noDataList bandNo="1" useSrcNoData="1"/>
+      </noData>
+      <map-layer-style-manager current="">
+        <map-layer-style name=""/>
+      </map-layer-style-manager>
+      <pipe>
+        <rasterrenderer opacity="0.490196" alphaBand="0" classificationMax="4000" classificationMinMaxOrigin="User" band="1" classificationMin="3000" type="singlebandpseudocolor">
+          <rasterTransparency/>
+          <rastershader>
+            <colorrampshader colorRampType="EXACT" clip="0">
+              <item alpha="255" value="3001" label="3001" color="#67f539"/>
+              <item alpha="255" value="3002" label="3002" color="#f53926"/>
+              <item alpha="255" value="3006" label="3006" color="#63b6ce"/>
+              <item alpha="255" value="3011" label="3011" color="#7c896e"/>
+              <item alpha="255" value="3014" label="3014" color="#c66cf6"/>
+              <item alpha="255" value="3017" label="3017" color="#a5258f"/>
+              <item alpha="255" value="3019" label="3019" color="#29682a"/>
+              <item alpha="255" value="3020" label="3020" color="#22fe7c"/>
+              <item alpha="255" value="3027" label="3027" color="#156472"/>
+              <item alpha="255" value="3028" label="3028" color="#fe7c89"/>
+              <item alpha="255" value="3029" label="3029" color="#729dfd"/>
+              <item alpha="255" value="3030" label="3030" color="#9dfd58"/>
+              <item alpha="255" value="3031" label="3031" color="#e3f3d4"/>
+              <item alpha="255" value="3032" label="3032" color="#b4a122"/>
+              <item alpha="255" value="3033" label="3033" color="#133ca5"/>
+              <item alpha="255" value="3034" label="3034" color="#f3d424"/>
+              <item alpha="255" value="3043" label="3043" color="#462e05"/>
+              <item alpha="255" value="3044" label="3044" color="#27b4a1"/>
+              <item alpha="255" value="3057" label="3057" color="#8fc66c"/>
+              <item alpha="255" value="3058" label="3058" color="#6e462e"/>
+              <item alpha="255" value="3061" label="3061" color="#896e46"/>
+              <item alpha="255" value="3062" label="3062" color="#2ad7fd"/>
+              <item alpha="255" value="3067" label="3067" color="#604a8b"/>
+              <item alpha="255" value="3071" label="3071" color="#4a8be8"/>
+              <item alpha="255" value="3079" label="3079" color="#4acb29"/>
+              <item alpha="255" value="3080" label="3080" color="#660f4a"/>
+              <item alpha="255" value="3081" label="3081" color="#682ad7"/>
+              <item alpha="255" value="3082" label="3082" color="#81604a"/>
+              <item alpha="255" value="3087" label="3087" color="#41bd63"/>
+              <item alpha="255" value="3088" label="3088" color="#4be90a"/>
+              <item alpha="255" value="3097" label="3097" color="#3ae6bd"/>
+              <item alpha="255" value="3098" label="3098" color="#e6bd81"/>
+              <item alpha="255" value="3099" label="3099" color="#bd8160"/>
+              <item alpha="255" value="3103" label="3103" color="#5d41bd"/>
+              <item alpha="255" value="3105" label="3105" color="#8f3ae6"/>
+              <item alpha="255" value="3108" label="3108" color="#0ab2f5"/>
+              <item alpha="255" value="3114" label="3114" color="#d42426"/>
+              <item alpha="255" value="3124" label="3124" color="#f60f7b"/>
+              <item alpha="255" value="3125" label="3125" color="#4afe91"/>
+              <item alpha="255" value="3126" label="3126" color="#fe9166"/>
+              <item alpha="255" value="3127" label="3127" color="#0f4acb"/>
+              <item alpha="255" value="3135" label="3135" color="#fd5d41"/>
+              <item alpha="255" value="3136" label="3136" color="#8be84a"/>
+              <item alpha="255" value="3137" label="3137" color="#e84afe"/>
+              <item alpha="255" value="3138" label="3138" color="#3ca525"/>
+              <item alpha="255" value="3145" label="3145" color="#cb2968"/>
+              <item alpha="255" value="3151" label="3151" color="#4a634b"/>
+              <item alpha="255" value="3152" label="3152" color="#258f3a"/>
+              <item alpha="255" value="3153" label="3153" color="#d7fd5d"/>
+              <item alpha="255" value="3154" label="3154" color="#2e0515"/>
+              <item alpha="255" value="3164" label="3164" color="#0f7b91"/>
+              <item alpha="255" value="3181" label="3181" color="#940627"/>
+              <item alpha="255" value="3182" label="3182" color="#b6ce4a"/>
+              <item alpha="255" value="3183" label="3183" color="#062755"/>
+              <item alpha="255" value="3184" label="3184" color="#2755b6"/>
+              <item alpha="255" value="3210" label="3210" color="#6cf60f"/>
+              <item alpha="255" value="3211" label="3211" color="#e90ab2"/>
+              <item alpha="255" value="3219" label="3219" color="#392694"/>
+              <item alpha="255" value="3220" label="3220" color="#91660f"/>
+              <item alpha="255" value="3221" label="3221" color="#269406"/>
+              <item alpha="255" value="3222" label="3222" color="#b2f57e"/>
+              <item alpha="255" value="3229" label="3229" color="#a122fe"/>
+              <item alpha="255" value="3230" label="3230" color="#2426ee"/>
+              <item alpha="255" value="3231" label="3231" color="#64729d"/>
+              <item alpha="255" value="3252" label="3252" color="#7b9198"/>
+              <item alpha="255" value="3255" label="3255" color="#051564"/>
+              <item alpha="255" value="3257" label="3257" color="#634be9"/>
+              <item alpha="255" value="3260" label="3260" color="#fd58e3"/>
+              <item alpha="255" value="3261" label="3261" color="#58e3f3"/>
+              <item alpha="255" value="3264" label="3264" color="#26ee13"/>
+              <item alpha="255" value="3265" label="3265" color="#ee133c"/>
+              <item alpha="255" value="3292" label="3292" color="#3913d1"/>
+              <item alpha="255" value="3293" label="3293" color="#13d18b"/>
+              <item alpha="255" value="3294" label="3294" color="#d18b27"/>
+              <item alpha="255" value="3295" label="3295" color="#8b27b4"/>
+              <item alpha="255" value="3296" label="3296" color="#6beac3"/>
+              <item alpha="255" value="3297" label="3297" color="#544794"/>
+              <item alpha="255" value="3298" label="3298" color="#eac339"/>
+              <item alpha="255" value="3299" label="3299" color="#c33913"/>
+              <item alpha="255" value="3900" label="3900" color="#6ab9d4"/>
+              <item alpha="255" value="3901" label="3901" color="#4794c4"/>
+              <item alpha="255" value="3902" label="3902" color="#164d54"/>
+              <item alpha="255" value="3903" label="3903" color="#1c7978"/>
+              <item alpha="255" value="3904" label="3904" color="#74ed10"/>
+              <item alpha="255" value="3910" label="3910" color="#5c164d"/>
+              <item alpha="255" value="3911" label="3911" color="#94c4c1"/>
+              <item alpha="255" value="3912" label="3912" color="#d45c16"/>
+              <item alpha="255" value="3913" label="3913" color="#788229"/>
+              <item alpha="255" value="3914" label="3914" color="#10e7f2"/>
+              <item alpha="255" value="3920" label="3920" color="#b9d45c"/>
+              <item alpha="255" value="3921" label="3921" color="#c4c167"/>
+              <item alpha="255" value="3923" label="3923" color="#f28436"/>
+              <item alpha="255" value="3924" label="3924" color="#441c79"/>
+              <item alpha="255" value="3925" label="3925" color="#4d5447"/>
+              <item alpha="255" value="3926" label="3926" color="#c167f5"/>
+              <item alpha="255" value="3928" label="3928" color="#84366a"/>
+              <item alpha="255" value="3929" label="3929" color="#a574ed"/>
+              <item alpha="255" value="3943" label="3943" color="#366ab9"/>
+              <item alpha="255" value="3944" label="3944" color="#29a574"/>
+              <item alpha="255" value="3960" label="3960" color="#55b6ab"/>
+              <item alpha="255" value="3961" label="3961" color="#e7f284"/>
+              <item alpha="255" value="3964" label="3964" color="#bd63b6"/>
+              <item alpha="255" value="3965" label="3965" color="#b6aba8"/>
+              <item alpha="255" value="3966" label="3966" color="#f57e42"/>
+              <item alpha="255" value="3967" label="3967" color="#aba82e"/>
+              <item alpha="255" value="3968" label="3968" color="#797882"/>
+              <item alpha="255" value="3980" label="3980" color="#a82ed7"/>
+              <item alpha="255" value="3981" label="3981" color="#ed10e7"/>
+              <item alpha="255" value="3982" label="3982" color="#7e428f"/>
+              <item alpha="255" value="3983" label="3983" color="#428fc6"/>
+              <item alpha="255" value="3984" label="3984" color="#c5441c"/>
+              <item alpha="255" value="3985" label="3985" color="#2ed76b"/>
+              <item alpha="255" value="3986" label="3986" color="#ce4a63"/>
+              <item alpha="255" value="3987" label="3987" color="#d76bea"/>
+              <item alpha="255" value="3988" label="3988" color="#8229a5"/>
+            </colorrampshader>
+          </rastershader>
+        </rasterrenderer>
+        <brightnesscontrast brightness="0" contrast="0"/>
+        <huesaturation colorizeGreen="128" colorizeOn="0" colorizeRed="255" colorizeBlue="128" grayscaleMode="0" saturation="0" colorizeStrength="100"/>
+        <rasterresampler maxOversampling="2"/>
+      </pipe>
+      <blendMode>0</blendMode>
+    </maplayer>
+  </projectlayers>
+  <properties>
+    <Variables>
+      <variableNames type="QStringList"/>
+      <variableValues type="QStringList"/>
+    </Variables>
+    <WMSContactPerson type="QString"></WMSContactPerson>
+    <WMSOnlineResource type="QString"></WMSOnlineResource>
+    <WMSUseLayerIDs type="bool">false</WMSUseLayerIDs>
+    <WMSContactOrganization type="QString"></WMSContactOrganization>
+    <WMSKeywordList type="QStringList">
+      <value></value>
+    </WMSKeywordList>
+    <WFSUrl type="QString"></WFSUrl>
+    <Paths>
+      <Absolute type="bool">false</Absolute>
+    </Paths>
+    <WMSServiceTitle type="QString"></WMSServiceTitle>
+    <WFSLayers type="QStringList"/>
+    <WMSContactMail type="QString"></WMSContactMail>
+    <PositionPrecision>
+      <DecimalPlaces type="int">2</DecimalPlaces>
+      <Automatic type="bool">true</Automatic>
+      <DegreeFormat type="QString">MU</DegreeFormat>
+    </PositionPrecision>
+    <WCSUrl type="QString"></WCSUrl>
+    <WMSContactPhone type="QString"></WMSContactPhone>
+    <WMSServiceCapabilities type="bool">false</WMSServiceCapabilities>
+    <WMSServiceAbstract type="QString"></WMSServiceAbstract>
+    <WMSContactPosition type="QString"></WMSContactPosition>
+    <WMSAddWktGeometry type="bool">false</WMSAddWktGeometry>
+    <Measure>
+      <Ellipsoid type="QString">WGS84</Ellipsoid>
+    </Measure>
+    <WMSPrecision type="QString">8</WMSPrecision>
+    <WMSSegmentizeFeatureInfoGeometry type="bool">false</WMSSegmentizeFeatureInfoGeometry>
+    <WFSTLayers>
+      <Insert type="QStringList"/>
+      <Update type="QStringList"/>
+      <Delete type="QStringList"/>
+    </WFSTLayers>
+    <Gui>
+      <SelectionColorBluePart type="int">0</SelectionColorBluePart>
+      <CanvasColorGreenPart type="int">255</CanvasColorGreenPart>
+      <CanvasColorRedPart type="int">255</CanvasColorRedPart>
+      <SelectionColorRedPart type="int">255</SelectionColorRedPart>
+      <SelectionColorAlphaPart type="int">255</SelectionColorAlphaPart>
+      <SelectionColorGreenPart type="int">255</SelectionColorGreenPart>
+      <CanvasColorBluePart type="int">255</CanvasColorBluePart>
+    </Gui>
+    <Digitizing>
+      <DefaultSnapToleranceUnit type="int">2</DefaultSnapToleranceUnit>
+      <LayerSnappingList type="QStringList"/>
+      <LayerSnappingEnabledList type="QStringList"/>
+      <SnappingMode type="QString">current_layer</SnappingMode>
+      <AvoidIntersectionsList type="QStringList"/>
+      <LayerSnappingToleranceUnitList type="QStringList"/>
+      <LayerSnapToList type="QStringList"/>
+      <DefaultSnapType type="QString">off</DefaultSnapType>
+      <DefaultSnapTolerance type="double">0</DefaultSnapTolerance>
+      <LayerSnappingToleranceList type="QStringList"/>
+    </Digitizing>
+    <Identify>
+      <disabledLayers type="QStringList"/>
+    </Identify>
+    <Macros>
+      <pythonCode type="QString"></pythonCode>
+    </Macros>
+    <WMSAccessConstraints type="QString">None</WMSAccessConstraints>
+    <WCSLayers type="QStringList"/>
+    <Legend>
+      <filterByMap type="bool">false</filterByMap>
+    </Legend>
+    <SpatialRefSys>
+      <ProjectCRSProj4String type="QString">+proj=utm +zone=11 +datum=WGS84 +units=m +no_defs</ProjectCRSProj4String>
+      <ProjectCrs type="QString">EPSG:32611</ProjectCrs>
+      <ProjectCRSID type="int">3095</ProjectCRSID>
+      <ProjectionsEnabled type="int">1</ProjectionsEnabled>
+    </SpatialRefSys>
+    <DefaultStyles>
+      <Fill type="QString"></Fill>
+      <Line type="QString"></Line>
+      <Marker type="QString"></Marker>
+      <RandomColors type="bool">true</RandomColors>
+      <AlphaInt type="int">255</AlphaInt>
+      <ColorRamp type="QString"></ColorRamp>
+    </DefaultStyles>
+    <WMSFees type="QString">conditions unknown</WMSFees>
+    <WMSImageQuality type="int">90</WMSImageQuality>
+    <Measurement>
+      <DistanceUnits type="QString">meters</DistanceUnits>
+      <AreaUnits type="QString">m2</AreaUnits>
+    </Measurement>
+    <WMSUrl type="QString"></WMSUrl>
+  </properties>
+  <visibility-presets/>
+</qgis>
