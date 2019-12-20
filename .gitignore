@@ -19,3 +19,10 @@
 /boehm_box/*.xml
 /boehm_box/*.shx
 /boehm_box/*.sbx
+
+/topo_management/veg_analysis/*.csv
+/topo_management/veg_analysis/veg_masks/
+/topo_management/veg_analysis/temp/
+/topo_management/veg_analysis/*.pdf
+/topo_management/veg_analysis/gis/*.qml
+/topo_management/veg_analysis/gis/*~

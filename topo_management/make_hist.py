@@ -38,25 +38,29 @@ if __name__ == "__main__":
     basins = [path_split(r)[-3] for r in basin_paths]
     total_cells = 0
     out.msg("Aggregating all unique {} values on {} topos".format(var, len(basin_paths)))
+
     for r in basin_paths:
         topo_f = pjoin(r, "topo.nc")
         ds = Dataset(topo_f)
         unique = np.unique(ds.variables[var][:])
         unique_var_all += list(unique)
         shape = ds.variables[var][:].shape
-        total_cells += shape[0]*shape[1]
+        basin_pixels = shape[0]*shape[1]
+        total_cells += basin_pixels
         ds.close()
 
     unique = sorted(list(set(unique)))
     out.msg("{} unique {} values across all topos.".format(len(unique),var))
     df = pd.DataFrame(columns=basins, index=unique)
-
+    pixels = {}
+    
     for r in basin_paths:
         out.msg('Working on {}'.format(r))
         topo_f = pjoin(r, "topo.nc")
         ds = Dataset(topo_f)
         basin_name = path_split(r)[-3]
-
+        basin_pixels = shape[0]*shape[1]
+        pixels[basin_name] = basin_pixels
         for v in unique:
             df[basin_name].loc[v] = (ds.variables[var][:]==v).sum()
 
@@ -69,7 +73,7 @@ if __name__ == "__main__":
     os.mkdir(out_dir)
 
     # Export only the ops basins
-    ops = ["merced","tuolumne","sanjoaquin","kings","kaweah"]
+    ops = ["merced","don_pedro","sanjoaquin","kings","kaweah"]
     df_ops = df[ops].copy()
     # df_ops = df_ops.div(total_cells)
     #ind = df_ops >= 0.01
@@ -79,7 +83,9 @@ if __name__ == "__main__":
 
 
     out.msg("\nPercent of Pixels containing the vegtypes:")
-    print((df_ops["total"].sort_values()/total_cells)*100.0)
+    df_ops['percent coverage'] = (df_ops["total"].sort_values()/total_cells)*100.0
+
+    # Make a percentage count
 
     plt.savefig(pjoin(out_dir, "{}_histogram.png".format(var)))
 
