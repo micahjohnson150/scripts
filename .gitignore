@@ -24,5 +24,6 @@
 /topo_management/veg_analysis/veg_masks/
 /topo_management/veg_analysis/temp/
 /topo_management/veg_analysis/*.pdf
+/topo_management/veg_analysis/*.md
 /topo_management/veg_analysis/gis/*.qml
 /topo_management/veg_analysis/gis/*~

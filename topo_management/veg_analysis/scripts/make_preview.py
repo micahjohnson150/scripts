@@ -87,7 +87,9 @@ def main():
     application = make_doc_str(application).format(__version__)
 
     # Add in a table of basin_setup veg tau and K
+    columns = ['tau','k','EVT_PHYS','EVT_CLASS']
     veg_data = pd.read_csv(__veg_parameters__, index_col=[0])
+    veg_data = veg_data[columns]
     table = tabulate(veg_data, tablefmt="pipe", headers="keys")
     sections = add_section(sections, application)
 
@@ -114,6 +116,18 @@ def main():
     impact = make_doc_str(impact)
     sections = add_section(sections, impact)
     sections = add_section(sections, table)
+
+    ################################# Notes ###################################
+    # notes =\
+    # ['## Notes on Value Selection',
+    # 'Selecting Tau and K values is a qualitatively process with minor guiding ',
+    # 'principles.',
+    # '1. Most shrub dominated areas are given 1 and 0',
+    # '2. Consider '
+    #
+    # ]
+    # appendix = make_doc_str(notes)
+    # sections = add_section(sections, notes)
 
     ################################# Appendix ###################################
     appendix =\
