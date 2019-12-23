@@ -78,7 +78,8 @@ def main():
     'through the topo.nc file provided to the modeling system as an input.'
     'Attached to the end of this document is a table of landfire vegetation'
     ' types and how basin_setup interprets them into vegetation Tau and K '
-    'values. These are based qualitatively on table below.'
+    'values. These are based qualitatively on table below. **NOTE Mu in the',
+    'table is K in the modeling system**'
     '\n\n![Veg Tau and K table]({} "Table for Vegetation K and Tau")'.format(tau_k_table),
      '\n[Source: Link & Marks 1999](https://doi.org/10.1002/(SICI)1099-1085(199910)13:14/15%3C2439::AID-HYP866%3E3.0.CO;2-1)',
 
