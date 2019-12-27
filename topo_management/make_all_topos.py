@@ -4,7 +4,7 @@ from subprocess import check_output, Popen
 import sys
 
 """
-Every basin in my basin folder has a make file and each is constructed simiarly.
+Every basin in my basin folder has a make file and each is constructed similarly.
 Thie script will go through all the basin topos with a make file and execute
 make < arg >
 

@@ -7,7 +7,7 @@ files
 """
 
 basins_dir = "~/projects/basins"
-copy_file = "~/projects/basins/docker-compose.yml"
+copy_file = "~/projects/basins/tuolumne/model_setup/docker-compose.yml"
 
 
 copy_file = os.path.expanduser(copy_file)
