@@ -27,3 +27,5 @@
 /topo_management/radiation_params_report/*.md
 /topo_management/radiation_params_report/gis/*.qml
 /topo_management/radiation_params_report/gis/*~
+
+/running_snobal/snobal.txt
