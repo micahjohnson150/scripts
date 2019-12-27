@@ -26,3 +26,10 @@ interactive:
 # Use the python script to create the plot
 plot:
 	python plot.py
+
+clean:
+	rm -f snobal.txt
+
+package:
+	make clean
+	zip example_snobal.zip *
