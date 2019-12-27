@@ -34,7 +34,6 @@ Script for plotting snobal text file results. Format (L->R) is
 import matplotlib.pyplot as plt
 import pandas as pd
 
-
 # Column names as brought in from IPW
 columns =   ['time_s', 'R_n', 'H', 'L_v_E', 'G', 'M', 'delta_Q', 'G_0',
              'delta_Q_0', 'cc_s_0', 'cc_s_l', 'cc_s', 'E_s', 'melt',
@@ -48,5 +47,5 @@ df  = pd.read_csv("snobal.txt", delimiter=" ", names=columns)
 df = df.set_index("time_s")
 
 # Plot snow depth for the first year.
-df['z_s'].plot()
+df['z_s'].iloc[0:8600].plot()
 plt.show()

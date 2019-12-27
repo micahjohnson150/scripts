@@ -22,3 +22,7 @@ run:
 # Runs docker interactively with the directories mapped to use ipw commands live
 interactive:
 	docker run -it -u $(uid) -v $(local_input_dir):$(docker_input_dir) $(ipw_image)
+
+# Use the python script to create the plot
+plot:
+	python plot.py
