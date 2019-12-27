@@ -5,16 +5,16 @@
   <evaluateDefaultValues active="0"/>
   <layer-tree-group expanded="1" checked="Qt::Checked" name="">
     <customproperties/>
-    <layer-tree-layer expanded="0" providerKey="gdal" checked="Qt::Checked" id="sanjoaquin_topo20191218155459897" source="/home/micahjohnson/projects/basins/california/analysis/new_veg_k_tau/veg_masks/sanjoaquin_topo.nc" name="sanjoaquin_topo">
+    <layer-tree-layer expanded="0" providerKey="gdal" checked="Qt::Checked" id="sanjoaquin_topo20191218155459897" source="/home/micahjohnson/projects/scripts/topo_management/veg_analysis/veg_masks/sanjoaquin_topo.nc" name="sanjoaquin_topo">
       <customproperties/>
     </layer-tree-layer>
-    <layer-tree-layer expanded="0" providerKey="gdal" checked="Qt::Checked" id="kings_topo20191218155457803" source="/home/micahjohnson/projects/basins/california/analysis/new_veg_k_tau/veg_masks/kings_topo.nc" name="kings_topo">
+    <layer-tree-layer expanded="0" providerKey="gdal" checked="Qt::Checked" id="kings_topo20191218155457803" source="/home/micahjohnson/projects/scripts/topo_management/veg_analysis/veg_masks/kings_topo.nc" name="kings_topo">
       <customproperties/>
     </layer-tree-layer>
-    <layer-tree-layer expanded="0" providerKey="gdal" checked="Qt::Checked" id="don_pedro_topo20191218155455985" source="/home/micahjohnson/projects/basins/california/analysis/new_veg_k_tau/veg_masks/don_pedro_topo.nc" name="don_pedro_topo">
+    <layer-tree-layer expanded="0" providerKey="gdal" checked="Qt::Checked" id="don_pedro_topo20191218155455985" source="/home/micahjohnson/projects/scripts/topo_management/veg_analysis/veg_masks/don_pedro_topo.nc" name="don_pedro_topo">
       <customproperties/>
     </layer-tree-layer>
-    <layer-tree-layer expanded="1" providerKey="" checked="Qt::Checked" id="OpenLayers_plugin_layer20191218152730121" source="/home/micahjohnson/projects/basins/california/analysis/new_veg_k_tau/gis" name="Bing Aerial">
+    <layer-tree-layer expanded="1" providerKey="" checked="Qt::Checked" id="OpenLayers_plugin_layer20191218152730121" source="/home/micahjohnson/projects/scripts/topo_management/veg_analysis/gis" name="Bing Aerial">
       <customproperties/>
     </layer-tree-layer>
   </layer-tree-group>
@@ -22,10 +22,10 @@
   <mapcanvas>
     <units>meters</units>
     <extent>
-      <xmin>5491.96800713130505756</xmin>
-      <ymin>3986022.71632329560816288</ymin>
-      <xmax>480511.96800713130505756</xmax>
-      <ymax>4294722.71632329653948545</ymax>
+      <xmin>236039.63261440116912127</xmin>
+      <ymin>4179016.59168234840035439</ymin>
+      <xmax>265728.38261440116912127</xmax>
+      <ymax>4198310.34168234840035439</ymax>
     </extent>
     <rotation>0</rotation>
     <projections>1</projections>

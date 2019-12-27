@@ -20,10 +20,10 @@
 /boehm_box/*.shx
 /boehm_box/*.sbx
 
-/topo_management/veg_analysis/*.csv
-/topo_management/veg_analysis/veg_masks/
-/topo_management/veg_analysis/temp/
-/topo_management/veg_analysis/*.pdf
-/topo_management/veg_analysis/*.md
-/topo_management/veg_analysis/gis/*.qml
-/topo_management/veg_analysis/gis/*~
+/topo_management/radiation_params_report/*.csv
+/topo_management/radiation_params_report/veg_masks/
+/topo_management/radiation_params_report/temp/
+/topo_management/radiation_params_report/*.pdf
+/topo_management/radiation_params_report/*.md
+/topo_management/radiation_params_report/gis/*.qml
+/topo_management/radiation_params_report/gis/*~
