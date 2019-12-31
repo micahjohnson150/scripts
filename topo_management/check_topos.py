@@ -16,6 +16,12 @@ projections compared to that in the basin_ops repo.
 e.g.
     python check_all_topos.py
 
+To run a single basin of a collection of basins, the script takes a string
+arg and looks for it in the paths when theyre collected.
+
+e.g.
+    python check_all_topos.py tuolumne
+
 """
 
 
@@ -40,6 +46,15 @@ if __name__ == "__main__":
     hdr = msg.format("Warning","Difference (dev - ops)")
     border = "=" * len(hdr)
 
+    # Check for basin name specifically by user
+    if len(sys.argv) == 2:
+        select_basin = sys.argv[1]
+        ops_paths = [p for p in ops_paths if select_basin in p]
+
+        # Wanr user if no matches found
+        if len(ops_paths) == 0:
+            out.error('{} not found in any ops paths'.format(select_basin))
+
     for r in ops_paths:
         basin_name = path_split(r)[-2]
         ops_f  = osjoin(r,"topo.nc")
@@ -49,6 +64,7 @@ if __name__ == "__main__":
         out.msg("Checking extents of {}...".format(basin_name))
 
         warnings = []
+        dimensional_issue = False
 
         for v in ["x", "y"]:
 
@@ -60,7 +76,8 @@ if __name__ == "__main__":
                 md = getattr(dev.variables[v][:], op)()
 
                 if mo != md:
-                    report = "{0} in {1} direction is not the same.".format(op.title(), v.title())
+                    report = ("{0} in {1} direction is not the same."
+                            "".format(op.title(), v.title()))
                     diff = "{:0.0f}".format(md-mo)
                     warnings.append(msg.format(report, diff))
 
@@ -72,6 +89,7 @@ if __name__ == "__main__":
             if dn != 0:
                 report = "n{} is not the same.".format(v)
                 warnings.append(msg.format(report, diff))
+                dimensional_issue = True
 
             # Check resolution
             res_diff = (dev.variables[v][0] - dev.variables[v][1]) - \
@@ -111,6 +129,8 @@ if __name__ == "__main__":
 
             for vz, data in ops.variables.items():
                 if vz != "projection" and vz not in missing_in_either:
+
+                    # Check data types
                     ops_type = data[:].dtype
                     dev_type = dev.variables[vz][:].dtype
 
@@ -118,6 +138,16 @@ if __name__ == "__main__":
                         report ="{} data type mismatch".format(vz)
                         diff = "Dev type = {}, Ops type = {}".format(dev_type, ops_type)
                         warnings.append(msg.format(report, diff))
+
+                    # Check data differences on same sized domains
+                    if vz not in ['x','y'] and not dimensional_issue:
+                        diff = (dev.variables[vz][:] - ops.variable[vz][:]).mean()
+
+                        if diff != 0:
+                            report = "{} not the same.".format(vz)
+                            diff = "{} (mean)".format(diff)
+                            warnings.append(report, diff)
+
 
         if len(warnings) != 0:
             out.warn("{} differences found in {} topo.".format(len(warnings), basin_name))
