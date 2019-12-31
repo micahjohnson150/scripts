@@ -86,7 +86,7 @@ if __name__ == "__main__":
             on = ops.variables[v].shape[0]
             diff = dn - on
 
-            if dn != 0:
+            if diff != 0:
                 report = "n{} is not the same.".format(v)
                 warnings.append(msg.format(report, diff))
                 dimensional_issue = True
@@ -141,12 +141,12 @@ if __name__ == "__main__":
 
                     # Check data differences on same sized domains
                     if vz not in ['x','y'] and not dimensional_issue:
-                        diff = (dev.variables[vz][:] - ops.variable[vz][:]).mean()
+                        diff = (dev.variables[vz][:] - ops.variables[vz][:]).mean()
 
                         if diff != 0:
                             report = "{} not the same.".format(vz)
-                            diff = "{} (mean)".format(diff)
-                            warnings.append(report, diff)
+                            diff = "{:0.5f} (mean)".format(diff)
+                            warnings.append(msg.format(report, diff))
 
 
         if len(warnings) != 0:

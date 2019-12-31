@@ -29,3 +29,4 @@
 /topo_management/radiation_params_report/gis/*~
 
 /running_snobal/snobal.txt
+/running_snobal/*.zip
