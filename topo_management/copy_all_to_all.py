@@ -1,4 +1,4 @@
-from make_all_topos import find_basin_paths
+from make_topos import find_basin_paths
 import os
 import sys
 from topo_diff import path_split

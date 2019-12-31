@@ -1,12 +1,16 @@
-from  os import listdir, walk, system
+#!/usr/bin/env python3
+
+from os import listdir, walk, system
 from os.path import isfile, isdir, basename, abspath, expanduser, split, getsize
 from os.path import join as osjoin
 from subprocess import check_output, Popen
-import sys
 from basin_setup.basin_setup import Messages
-from make_all_topos import find_basin_paths
+from make_topos import find_basin_paths
 from netCDF4 import Dataset
 from topo_diff import path_split
+import argparse
+
+
 """
 Every basin in my basin folder which is of similar structure (<basin>/model_setup/Makefile)
 
@@ -34,6 +38,15 @@ if __name__ == "__main__":
     ops_dir = "~/projects/basin_ops"
     dev_dir = "~/projects/basins"
 
+
+    parser = argparse.ArgumentParser(description="Compare our committed basin"
+                                    " topos to the development topos.")
+    parser.add_argument('--keyword','-kw', dest='kw',
+                        help='Filter basin_ops paths for kw e.g. tuolumne will'
+                             ' find only one topo to process')
+
+    args = parser.parse_args()
+
     ops_paths = find_basin_paths(ops_dir, indicator_folder="topo",
                                           indicator_file="topo.nc")
 
@@ -47,13 +60,12 @@ if __name__ == "__main__":
     border = "=" * len(hdr)
 
     # Check for basin name specifically by user
-    if len(sys.argv) == 2:
-        select_basin = sys.argv[1]
-        ops_paths = [p for p in ops_paths if select_basin in p]
+    if args.kw != None:
+        ops_paths = [p for p in ops_paths if args.kw in p]
 
         # Wanr user if no matches found
         if len(ops_paths) == 0:
-            out.error('{} not found in any ops paths'.format(select_basin))
+            out.error('{} not found in any ops paths'.format(args.kw))
 
     for r in ops_paths:
         basin_name = path_split(r)[-2]
@@ -78,7 +90,7 @@ if __name__ == "__main__":
                 if mo != md:
                     report = ("{0} in {1} direction is not the same."
                             "".format(op.title(), v.title()))
-                    diff = "{:0.0f}".format(md-mo)
+                    diff = "{:0.4f}".format(md-mo)
                     warnings.append(msg.format(report, diff))
 
             # Check number of cells

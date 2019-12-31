@@ -1,4 +1,4 @@
-from make_all_topos import find_basin_paths
+from make_topos import find_basin_paths
 import os
 from os.path import split
 import matplotlib.pyplot as plt
