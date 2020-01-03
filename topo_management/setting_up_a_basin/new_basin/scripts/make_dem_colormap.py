@@ -1,5 +1,5 @@
 """
-Generate a dem_style.qml
+Generate a dem_style.qml 
 
 usage:
     python make_dem_colormap.py dem.tif
