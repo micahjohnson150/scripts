@@ -1,42 +1,42 @@
-############## INPUTS ##############################################
+############################# INPUTS ###########################################
 DEM_SOURCE := dem_sources.txt
 BASIN_NAME := lakes basin
 POUR_POINTS := pour_points.bna
 EPSG := 32611
-MAX_EXTENT := 192430.332406 4246668.72476 308936.219094 4170968.50051
+MAX_EXTENT := 319875 4158153 327855 4166775
 DELINEATE_THRESHOLD := 10000000
-RESOLUTION := 10
+DELINEATE_RESOLUTION := 10
 NTHREADS := 2
 
-#####################################################################
+################################################################################
 
 # Build the dem file name
-DEM_IMG := $$(python -c "print('{}_dem_EPSG{}.tif'.format('$(BASIN_NAME)'.lower(),'$(EPSG)').replace(' ','_'))")
+DEM_IMG := ./dem/$$(python3.6 -c "print('{}_dem_EPSG{}.tif'.format('$(BASIN_NAME)'.lower(),'$(EPSG)').replace(' ','_'))")
 
 # Build a zip file name
-ZIP := $$(python -c "print('{}_shapefile_EPSG{}.zip'.format('$(BASIN_NAME)'.lower(),'$(EPSG)').replace(' ','_'))")
+ZIP:=$$(python3.6 -c "print('{}_shapefile_EPSG{}.zip'.format('$(BASIN_NAME)'.lower(),'$(EPSG)').replace(' ','_'))")
 
 # Rebuild the BASIN_NAME to look pretty
-BASIN_NAME := $$(python -c"print('$(BASIN_NAME)'.title())")
+BASIN_NAME:=$$(python3.6 -c "print('{}'.format('$(BASIN_NAME)'.title()).replace('_',' '))")
 
 test:
-	echo $(dem_img)
-	echo $(basin_name)
+	echo $(DEM_IMG)
+	echo $(BASIN_NAME)
 
 all:
 	make delineate
 	make topo
 
 init:
+	# Download and build dem
 	make download_dem
 	make dem_process
-	make delineate
 	# Delineate without the rerun
 	delineate -p $(POUR_POINTS) \
 						-d $(DEM_IMG) \
 						-t $(DELINEATE_THRESHOLD) \
 						-n $(NTHREADS) \
-						-strm \
+						-strm
 	make topo
 	make qgis_data
 
@@ -61,7 +61,7 @@ dem_process:
 	# Reproject the image and overwrite
 	gdalwarp -overwrite \
 					 -t_srs EPSG:$(EPSG) \
-					 -tr $(RESOLUTION) $(RESOLUTION) \
+					 -tr $(DELINEATE_RESOLUTION) $(DELINEATE_RESOLUTION) \
 					 -r bilinear \
 					 $(MOSAIC) \
 					 $(FULL_DEM)
@@ -70,7 +70,7 @@ dem_process:
 								 -of GTiff \
 								 -r bilinear \
 								 $(FULL_DEM) \
-								 ./dem/$(DEM_IMG)
+								 $(DEM_IMG)
 	# Clean up some processing images
 	rm $(MOSAIC) $(FULL_DEM)
 
@@ -86,11 +86,11 @@ delineate:
 topo:
 
 	# Basin Setup
-	docker-compose run -u $(uid) basin_setup -f  delineation/basin_outline.shp \
-																					 -bn $(BASIN_NAME) \
-																					 -sb delineation/*_subbasin.shp \
-																					 -dm $(DEM_IMG) \
-																					 -d /Downloads
+	basin_setup -f  delineation/basin_outline.shp \
+							-bn $(BASIN_NAME) \
+							-sb delineation/*_subbasin.shp \
+							-dm $(DEM_IMG) \
+							-d /Downloads
 
 gis_package:
 	zip $(ZIP) ./delineation/*basin_outline.* ./delineation/*_subbasin.*
