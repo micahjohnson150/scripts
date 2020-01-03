@@ -3,8 +3,8 @@ DEM_SOURCE := dem_sources.txt
 BASIN_NAME := lakes basin
 POUR_POINTS := pour_points.bna
 EPSG := 32611
-MAX_EXTENT := 319875 4158153 327855 4166775
-DELINEATE_THRESHOLD := 10000000
+MAX_EXTENT := 318520.405027 4167937.07547 329767.728206 4157522.88734
+DELINEATE_THRESHOLD := 100000
 DELINEATE_RESOLUTION := 10
 NTHREADS := 2
 
@@ -26,7 +26,9 @@ test:
 all:
 	make delineate
 	make topo
-
+	make qgis_data
+	make gis_package
+	
 init:
 	# Download and build dem
 	make download_dem
@@ -99,7 +101,7 @@ qgis_data:
 	# Make the dem colormap and hillshade
 	gdaldem hillshade $(DEM_IMG) ./dem/hillshade.tif
 	mkdir -p ./colormaps
-	python3.5 scripts/make_dem_colormap.py $(DEM_IMG)
+	python3.6 scripts/make_dem_colormap.py $(DEM_IMG)
 
 clean_all:
 	rm -rf dem basin_setup delineate

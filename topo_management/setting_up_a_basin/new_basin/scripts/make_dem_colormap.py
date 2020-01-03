@@ -1,5 +1,5 @@
 """
-Generate a dem_style.qml 
+Generate a dem_style.qml
 
 usage:
     python make_dem_colormap.py dem.tif
@@ -31,7 +31,7 @@ s = check_output(cmd, shell=True)
 stats = {}
 
 # Parse the output of gdalinfo
-for line in s.split("\n"):
+for line in s.decode('utf-8').split("\n"):
     ll = line.lower()
     if "statistics_" in ll:
         if "=" in ll:
