@@ -5,8 +5,9 @@
   <evaluateDefaultValues active="0"/>
   <layer-tree-group expanded="1" checked="Qt::Checked" name="">
     <customproperties/>
+[SHAPEFILE_DECLARATATION]
     <layer-tree-layer expanded="1" providerKey="gdal" checked="Qt::Checked" id="[DEM_NAME][ID]" source="[DEM_PATH]" name="[DEM_NAME]">
-      <customproperties/>
+    <customproperties/>
     </layer-tree-layer>
     <layer-tree-layer expanded="1" providerKey="gdal" checked="Qt::Checked" id="[HILLSHADE_NAME][ID]" source="[HILLSHADE_PATH]" name="[HILLSHADE_NAME]">
       <customproperties/>
@@ -40,6 +41,7 @@
   </mapcanvas>
   <layer-tree-canvas>
     <custom-order enabled="0">
+[SHAPEFILE_ORDER]
       <item>[HILLSHADE_NAME][ID]</item>
       <item>[DEM_NAME][ID]</item>
     </custom-order>
@@ -57,6 +59,7 @@
     </legendlayer>
   </legend>
   <projectlayers>
+[SHAPEFILE_LAYERS]
     <maplayer minimumScale="0" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
       <extent>
         <xmin>318520.40502700000070035</xmin>
@@ -143,7 +146,7 @@
         <map-layer-style name=""/>
       </map-layer-style-manager>
       <pipe>
-        [DEM_COLORMAP]
+[DEM_COLORMAP]
       </pipe>
       <blendMode>0</blendMode>
     </maplayer>
