@@ -42,12 +42,12 @@ for line in s.decode('utf-8').split("\n"):
 
 # Double color ramp, 0 transparent, 1-30% Dark green to light brown, to white
 colors = OrderedDict()
-colors[0.05] = [0,120,0]
-colors[0.50] = [89,86,0]
-colors[0.93] = [119,75,0]
-colors[1.1] = [146, 110, 49]
-colors[1.2] = [173, 146, 101]
-colors[1.99] = [255, 255, 255]
+colors[0.01] = [0,120,0]
+colors[0.28] = [89,86,0]
+colors[0.47] = [119,75,0]
+colors[0.6] = [146, 110, 49]
+colors[0.74] = [173, 146, 101]
+colors[0.95] = [255, 255, 255]
 
 alpha = 200
 
@@ -95,7 +95,7 @@ with open(output,'w+') as fp:
     for percent, rgb in colors.items():
 
         # Snag the value from the linspace
-        value = stats['mean'] * percent
+        value = (stats['maximum'] - stats['minimum']) * percent + stats['minimum']
 
         # Form the hex value
         hex_v = '#%02x%02x%02x' % (rgb[0], rgb[1], rgb[2])

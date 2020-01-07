@@ -22,7 +22,7 @@ BASIN_NAME:=$$(python3.6 -c "print('{}'.format('$(BASIN_NAME)'.title()).replace(
 all:
 	make delineate
 	make topo
-	make qgis_data
+	make qgis
 	make gis_package
 
 init:
