@@ -24,7 +24,7 @@ all:
 	make topo
 	make qgis_data
 	make gis_package
-	
+
 init:
 	# Download and build dem
 	make download_dem
@@ -93,11 +93,12 @@ topo:
 gis_package:
 	zip $(ZIP) ./delineation/*basin_outline.* ./delineation/*_subbasin.*
 
-qgis_data:
+qgis:
 	# Make the dem colormap and hillshade
 	gdaldem hillshade $(DEM_IMG) ./dem/hillshade.tif
 	mkdir -p ./colormaps
 	python3.6 scripts/make_dem_colormap.py $(DEM_IMG)
+	python3.6 scripts/make_qgis_proj.py $(DEM_IMG) ./dem/hillshade.tif ./colormaps/dem_colormap.qml -s ./delineation/*subbasin.shp
 
 clean_all:
 	rm -rf dem basin_setup delineate

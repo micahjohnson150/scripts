@@ -3,7 +3,7 @@ import argparse
 from os.path import basename
 
 
-def create_shapefile_str(shapefiles, epsg, str_now, template='shapefile_template.xml'):
+def create_shapefile_str(shapefiles, epsg, str_now, template='./scripts/shapefile_template.xml'):
     """
     Create three strings to insert in to the qgis project
     """
@@ -79,7 +79,14 @@ def main():
     lines = lines[idx[0]+1:idx[1]]
     colormap = "\t\t".join(lines)
 
-    shp_declarations, shp_order, shp_layers = create_shapefile_str(["../delineation/basin_outline.shp"],32611,str_now)
+    # Add the basin_outline
+    shp_declarations, shp_order, shp_layers = create_shapefile_str(["./delineation/basin_outline.shp"],32611,str_now)
+    print(args.shapefiles)
+    # Add all the subbasins
+    shps = create_shapefile_str(args.shapefiles, 32611, str_now)
+    shp_declarations += shps[0]
+    shp_order += shps[1]
+    shp_layers += shps[2]
 
     # Populate replacement info
     replacements = \
@@ -98,7 +105,7 @@ def main():
     }
 
     # Open the template
-    fname = 'template.xml'
+    fname = './scripts/template.xml'
 
     with open(fname,'r') as fp:
         lines = fp.readlines()
@@ -108,7 +115,7 @@ def main():
 
     info = str_swap(info, replacements)
 
-    out = "test.qgs"
+    out = "setup.qgs"
 
     with open(out,'w+') as fp:
         fp.write(info)
