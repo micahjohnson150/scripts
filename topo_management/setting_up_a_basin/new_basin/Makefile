@@ -19,10 +19,6 @@ ZIP:=$$(python3.6 -c "print('{}_shapefile_EPSG{}.zip'.format('$(BASIN_NAME)'.low
 # Rebuild the BASIN_NAME to look pretty
 BASIN_NAME:=$$(python3.6 -c "print('{}'.format('$(BASIN_NAME)'.title()).replace('_',' '))")
 
-test:
-	echo $(DEM_IMG)
-	echo $(BASIN_NAME)
-
 all:
 	make delineate
 	make topo

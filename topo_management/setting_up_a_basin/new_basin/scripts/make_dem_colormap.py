@@ -42,12 +42,12 @@ for line in s.decode('utf-8').split("\n"):
 
 # Double color ramp, 0 transparent, 1-30% Dark green to light brown, to white
 colors = OrderedDict()
-colors[0.01] = [0,120,0]
-colors[0.28] = [89,86,0]
-colors[0.47] = [119,75,0]
-colors[0.74] = [146, 110, 49]
-colors[0.74] = [173, 146, 101]
-colors[0.99] = [255, 255, 255]
+colors[0.05] = [0,120,0]
+colors[0.50] = [89,86,0]
+colors[0.93] = [119,75,0]
+colors[1.1] = [146, 110, 49]
+colors[1.2] = [173, 146, 101]
+colors[1.99] = [255, 255, 255]
 
 alpha = 200
 
@@ -85,9 +85,8 @@ with open(output,'w+') as fp:
     # Write the upper portion of the file
     fp.write(hdr.format(stats['maximum'],stats['minimum']))
 
-    #Number of colors dictate the number of color separations
+    # Number of colors dictate the number of color separations
     n_colors = len(colors)
-    dem_range = np.linspace(stats["maximum"]*0.01, stats['maximum']*0.99, n_colors)
 
     # Always add a 0-1 thats transparent
     hex_v = '#%02x%02x%02x' % (255, 255, 255)
@@ -96,7 +95,7 @@ with open(output,'w+') as fp:
     for percent, rgb in colors.items():
 
         # Snag the value from the linspace
-        value = stats['maximum'] * percent
+        value = stats['mean'] * percent
 
         # Form the hex value
         hex_v = '#%02x%02x%02x' % (rgb[0], rgb[1], rgb[2])

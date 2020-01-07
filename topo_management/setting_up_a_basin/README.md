@@ -1,18 +1,34 @@
 # Setting Up AWSM for a Brand New Basin
 Currently this setup is only describing how to get data for the US. That really
 only means that we have streamlined the data for the US and that there are some
-extra modifications for outside the US.
+extra modifications required for outside the US. This namely applies to vegetation data.
 
+## Requirements
+To setup a new basin for AWSM tends to be an iterative process. To follow this
+guide you will need:
+  * Docker/ Docker-compose installed
+  * An internet connection
+  * Pour points
+  * URLS for downloading dem data
 
 ## Getting Started
 We have written a generic makefile and project for you to use. The project
 is a working example which should be edited to meet your projects needs.
+Below is the high level overview of what to edit. These are followed by a
+more info on each
 
-1. The first step is to copy the folder new_basin.
-2. 
+The first step is to copy the folder new_basin and open it. Then:
+1. Edit the file pour_points.bna
+2. Edit the file dem_sources.txt
+3. Edit the Makefile
 
+## Add Pour Points (pour_points.bna)
+Adding pour points will dictate big your basin is. There is not a limit to the
+number of pour points used but there is a limitation on how many will be
+represented based on the delineation threshold used. The name given to a pour
+point is used to name the subbasin so name the pour point sensically.
 
-## Getting DEM Data for the US
+## Getting DEM Data for the US (dem_source.txt)
 * Go to https://viewer.nationalmap.gov/basic/
 * Select Elevation Products
 * Select 1/3 arc second-dem and under format select img data
@@ -24,8 +40,8 @@ is a working example which should be edited to meet your projects needs.
 * Move the file to this folder and rename to dem_sources.txt
 
 ## Makefile Inputs
-Feel free to edit the contents of the variables at the top of the Makefile to
-get the results desired.
+The top of the Makefile has several inputs variables which can be edited without
+much concern for raising errors. They are:
 
 1. DEM_SOURCE - Text file containing URLS to dem tiles to download
 2. BASIN_NAME - Name to use for naming files, and the proper name in the final topo
@@ -36,10 +52,12 @@ get the results desired.
 7. DELINEATE_RESOLUTION - Cellsize resolution used for delineation (Meters)
 8. NTHREADS - Number of processes to launch for delineating the basin
 
-## Setup
-To setup a new basin for AWSM tends to be an iterative process. To follow this
-guide you will need:
-  * Docker/ Docker-compose installed
-  * An internet connection
-  * Pour points
-  * URLS for downloading dem data
+There are several make commands which can be used.
+
+1. download_dem - Downloads the data in the dem_sources.txt
+2. dem_process - Make the full reprojected DEM mosaic in the project dictated by EPSG
+3. delineate - Delineate the basin using the full dem, pour points, and delineation threshold
+4. topo - makes the static input netcdf for AWSM known as the topo.nc
+5. gis_package - creates a zip file of all the shapefiles created in the delineation
+6. qgis - Create a hillshade from the dem and make a colormap for it
+7. clean_all - delete all the generated data, CAUTION: This deletes the downloads too.
