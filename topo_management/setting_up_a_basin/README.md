@@ -59,5 +59,16 @@ There are several make commands which can be used.
 3. delineate - Delineate the basin using the full dem, pour points, and delineation threshold
 4. topo - makes the static input netcdf for AWSM known as the topo.nc
 5. gis_package - creates a zip file of all the shapefiles created in the delineation
-6. qgis - Create a hillshade from the dem and make a colormap for it
+6. qgis - Create a hillshade, make a colormap for it and build a qgis project with it all.
 7. clean_all - delete all the generated data, CAUTION: This deletes the downloads too.
+8. init - Use this command when running on an empty project, this will download and process the dems, delineate without the retry flag.
+9. all - Rerun the delineate, topo, qgis, and gis package commands.
+
+
+## Using This With Docker
+In the project folder there is a pre-configured docker-compose file which
+describes to docker how to mount directories and run commands. To execute these
+commands described above simple navigate to the project folder, and enter into
+the terminal:
+
+>> docker-compose run make <command>
