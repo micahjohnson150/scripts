@@ -42,7 +42,7 @@ for line in s.decode('utf-8').split("\n"):
 
 # Double color ramp, 0 transparent, 1-30% Dark green to light brown, to white
 colors = OrderedDict()
-colors[0.01] = [0,120,0]
+colors[0.01] = [76, 119, 72]
 colors[0.28] = [89,86,0]
 colors[0.47] = [119,75,0]
 colors[0.7] = [146, 110, 49]

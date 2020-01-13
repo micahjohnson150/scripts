@@ -2,14 +2,14 @@ version: '3'
 
 services:
    make:
-      image: usdaarsnwrc/basin_setup:test
+      image: usdaarsnwrc/basin_setup:0.13
       volumes:
         - ./:/data
         - ~/Downloads:/Downloads
       entrypoint: make
 
    cmd:
-      image: usdaarsnwrc/basin_setup:test
+      image: usdaarsnwrc/basin_setup:0.13
       volumes:
         - ./:/data
       entrypoint: /bin/bash
