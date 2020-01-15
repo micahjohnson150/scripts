@@ -101,4 +101,4 @@ qgis:
 	python3.6 scripts/make_qgis_proj.py $(DEM_IMG) ./dem/hillshade.tif ./colormaps/dem_colormap.qml -s ./delineation/*subbasin.shp
 
 clean_all:
-	rm -rf dem basin_setup delineate
+	rm -rf dem basin_setup delineation
