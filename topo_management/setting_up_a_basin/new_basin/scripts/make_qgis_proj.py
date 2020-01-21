@@ -2,6 +2,8 @@ import datetime
 import argparse
 from os.path import basename
 
+def create_netcdf_str():
+    pass
 
 def create_shapefile_str(shapefiles, epsg, str_now, template='./scripts/shapefile_template.xml'):
     """
@@ -11,6 +13,7 @@ def create_shapefile_str(shapefiles, epsg, str_now, template='./scripts/shapefil
     shp_declarations = ''
     shp_order = ''
     shp_layers = ''
+    shp_colors = ''
 
     # Generic entry for declaring a single shapefile
     declaration =(
@@ -28,11 +31,21 @@ def create_shapefile_str(shapefiles, epsg, str_now, template='./scripts/shapefil
 
 
     for sb in shapefiles:
+        # Assign color using the name of the file
+        if "net_thresh" in sb:
+            color = "0,50,78,0"
+            shp_type = 'Line'
+        else:
+            color = "41,41,41,0"
+            shp_type = 'Polygon'
+
         name = basename(sb).split('.')[0]
         shp_replace = {"SHAPEFILE_PATH": sb,
                         "SHAPEFILE_NAME": name,
                         "EPSG": str(epsg),
-                        "ID": str_now}
+                        "ID": str_now,
+                        "SHAPEFILE_COLOR":color,
+                        "SHAPEFILE_TYPE":shp_type}
 
         shp_declarations += declaration.format(name, str_now, sb)
         shp_order += order.format(name,str_now)
@@ -62,7 +75,7 @@ def main():
     parser.add_argument('-s','--shapefiles', dest='shapefiles', nargs='+', help='Paths to the shapefiles')
 
     args = parser.parse_args()
-
+    EPSG = 32611
     ######## INPUTS ########
 
     # QGIS appends an identifier to each so construct it here
@@ -79,14 +92,26 @@ def main():
     lines = lines[idx[0]+1:idx[1]]
     colormap = "\t\t".join(lines)
 
-    # Add the basin_outline
-    shp_declarations, shp_order, shp_layers = create_shapefile_str(["./delineation/basin_outline.shp"],32611,str_now)
-    print(args.shapefiles)
-    # Add all the subbasins
-    shps = create_shapefile_str(args.shapefiles, 32611, str_now)
-    shp_declarations += shps[0]
-    shp_order += shps[1]
-    shp_layers += shps[2]
+    # Add the basin_outline, then the subbasins, then the stream network shpaeifles
+    shp_declarations = ''
+    shp_order = ''
+    shp_layers = ''
+
+    print("Adding shapefiles to the project...")
+    for kw in ['outline','subbasin','net_thresh']:
+        if kw == 'net_thresh':
+            template = './scripts/stream_template.xml'
+        else:
+            template = './scripts/shapefile_template.xml'
+
+        # Collect the shapefiles with the keyword
+        basins_shps = [f for f in args.shapefiles if kw in f]
+        print('Adding {}'.format(basins_shps))
+        shps = create_shapefile_str(basins_shps, EPSG, str_now, template=template)
+        shp_declarations += shps[0]
+        shp_order += shps[1]
+        shp_layers += shps[2]
+
 
     # Populate replacement info
     replacements = \
@@ -96,12 +121,12 @@ def main():
     "DEM_PATH": args.dem,
     "HILLSHADE_NAME":basename(args.hillshade).split('.')[0],
     "HILLSHADE_PATH":args.hillshade,
-    "EPSG":'32611',
+    "EPSG":str(EPSG),
     # "PROJ4":,
     "DEM_COLORMAP":colormap,
     "SHAPEFILE_DECLARATATION":shp_declarations,
     "SHAPEFILE_ORDER": shp_order,
-    "SHAPEFILE_LAYERS": shp_layers
+    "SHAPEFILE_LAYERS": shp_layers,
     }
 
     # Open the template

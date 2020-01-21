@@ -1,4 +1,10 @@
-<maplayer simplifyAlgorithm="0" minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" readOnly="0" geometry="[SHAPEFILE_TYPE]" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
+<maplayer simplifyAlgorithm="0" minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" readOnly="0" geometry="Line" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
+  <extent>
+    <xmin>321524.69001836841925979</xmin>
+    <ymin>4159516.77460673218593001</ymin>
+    <xmax>326163.58597841823939234</xmax>
+    <ymax>4165853.23840176127851009</ymax>
+  </extent>
   <id>[SHAPEFILE_NAME][ID]</id>
   <datasource>[SHAPEFILE_PATH]</datasource>
   <keywordList>
@@ -25,25 +31,77 @@
     <map-layer-style name=""/>
   </map-layer-style-manager>
   <edittypes>
-    <edittype widgetv2type="TextEdit" name="DN">
+    <edittype widgetv2type="TextEdit" name="LINKNO">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="DSLINKNO">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="USLINKNO1">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="USLINKNO2">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="DSNODEID">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="strmOrder">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="Length">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="Magnitude">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="DSContArea">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="strmDrop">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="Slope">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="StraightL">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="USContArea">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="WSNO">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="DOUTEND">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="DOUTSTART">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="DOUTMID">
       <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
     </edittype>
   </edittypes>
   <renderer-v2 forceraster="0" symbollevels="0" type="singleSymbol" enableorderby="0">
     <symbols>
-      <symbol alpha="1" clip_to_extent="1" type="fill" name="0">
-        <layer pass="0" class="SimpleFill" locked="0">
-          <prop k="border_width_map_unit_scale" v="0,0,0,0,0,0"/>
-          <prop k="color" v="[SHAPEFILE_COLOR]"/>
+      <symbol alpha="1" clip_to_extent="1" type="line" name="0">
+        <layer pass="0" class="SimpleLine" locked="0">
+          <prop k="capstyle" v="square"/>
+          <prop k="customdash" v="5;2"/>
+          <prop k="customdash_map_unit_scale" v="0,0,0,0,0,0"/>
+          <prop k="customdash_unit" v="MM"/>
+          <prop k="draw_inside_polygon" v="0"/>
           <prop k="joinstyle" v="bevel"/>
-          <prop k="offset" v="0,0"/>
+          <prop k="line_color" v="0,50,78,255"/>
+          <prop k="line_style" v="solid"/>
+          <prop k="line_width" v="0.7"/>
+          <prop k="line_width_unit" v="MM"/>
+          <prop k="offset" v="0"/>
           <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
           <prop k="offset_unit" v="MM"/>
-          <prop k="outline_color" v="0,0,0,255"/>
-          <prop k="outline_style" v="solid"/>
-          <prop k="outline_width" v="0.7"/>
-          <prop k="outline_width_unit" v="MM"/>
-          <prop k="style" v="solid"/>
+          <prop k="use_custom_dash" v="0"/>
+          <prop k="width_map_unit_scale" v="0,0,0,0,0,0"/>
         </layer>
       </symbol>
     </symbols>
@@ -114,7 +172,7 @@
     <property key="labeling/obstacleType" value="0"/>
     <property key="labeling/offsetType" value="0"/>
     <property key="labeling/placeDirectionSymbol" value="0"/>
-    <property key="labeling/placement" value="1"/>
+    <property key="labeling/placement" value="2"/>
     <property key="labeling/placementFlags" value="10"/>
     <property key="labeling/plussign" value="false"/>
     <property key="labeling/predefinedPositionOrder" value="TR,TL,BR,BL,R,L,TSR,BSR"/>
@@ -197,7 +255,7 @@
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
   <layerTransparency>0</layerTransparency>
-  <displayfield>DN</displayfield>
+  <displayfield>DSNODEID</displayfield>
   <label>0</label>
   <labelattributes>
     <label fieldname="" text="Label"/>
@@ -246,17 +304,49 @@
       </layer>
     </symbol>
   </SingleCategoryDiagramRenderer>
-  <DiagramLayerSettings yPosColumn="-1" showColumn="-1" linePlacementFlags="10" placement="0" dist="0" xPosColumn="-1" priority="0" obstacle="0" zIndex="0" showAll="1"/>
+  <DiagramLayerSettings yPosColumn="-1" showColumn="-1" linePlacementFlags="10" placement="2" dist="0" xPosColumn="-1" priority="0" obstacle="0" zIndex="0" showAll="1"/>
   <annotationform></annotationform>
   <aliases>
-    <alias field="DN" index="0" name=""/>
+    <alias field="LINKNO" index="0" name=""/>
+    <alias field="DSLINKNO" index="1" name=""/>
+    <alias field="USLINKNO1" index="2" name=""/>
+    <alias field="USLINKNO2" index="3" name=""/>
+    <alias field="DSNODEID" index="4" name=""/>
+    <alias field="strmOrder" index="5" name=""/>
+    <alias field="Length" index="6" name=""/>
+    <alias field="Magnitude" index="7" name=""/>
+    <alias field="DSContArea" index="8" name=""/>
+    <alias field="strmDrop" index="9" name=""/>
+    <alias field="Slope" index="10" name=""/>
+    <alias field="StraightL" index="11" name=""/>
+    <alias field="USContArea" index="12" name=""/>
+    <alias field="WSNO" index="13" name=""/>
+    <alias field="DOUTEND" index="14" name=""/>
+    <alias field="DOUTSTART" index="15" name=""/>
+    <alias field="DOUTMID" index="16" name=""/>
   </aliases>
   <excludeAttributesWMS/>
   <excludeAttributesWFS/>
   <attributeactions default="-1"/>
-  <attributetableconfig actionWidgetStyle="dropDown" sortExpression="" sortOrder="102">
+  <attributetableconfig actionWidgetStyle="dropDown" sortExpression="" sortOrder="0">
     <columns>
-      <column width="-1" hidden="0" type="field" name="DN"/>
+      <column width="-1" hidden="0" type="field" name="LINKNO"/>
+      <column width="-1" hidden="0" type="field" name="DSLINKNO"/>
+      <column width="-1" hidden="0" type="field" name="USLINKNO1"/>
+      <column width="-1" hidden="0" type="field" name="USLINKNO2"/>
+      <column width="-1" hidden="0" type="field" name="DSNODEID"/>
+      <column width="-1" hidden="0" type="field" name="strmOrder"/>
+      <column width="-1" hidden="0" type="field" name="Length"/>
+      <column width="-1" hidden="0" type="field" name="Magnitude"/>
+      <column width="-1" hidden="0" type="field" name="DSContArea"/>
+      <column width="-1" hidden="0" type="field" name="strmDrop"/>
+      <column width="-1" hidden="0" type="field" name="Slope"/>
+      <column width="-1" hidden="0" type="field" name="StraightL"/>
+      <column width="-1" hidden="0" type="field" name="USContArea"/>
+      <column width="-1" hidden="0" type="field" name="WSNO"/>
+      <column width="-1" hidden="0" type="field" name="DOUTEND"/>
+      <column width="-1" hidden="0" type="field" name="DOUTSTART"/>
+      <column width="-1" hidden="0" type="field" name="DOUTMID"/>
       <column width="-1" hidden="1" type="actions"/>
     </columns>
   </attributetableconfig>
@@ -289,7 +379,23 @@ control = dialog.findChild(QWidget, "MyLineEdit")
     <fieldstyles/>
   </conditionalstyles>
   <defaults>
-    <default field="DN" expression=""/>
+    <default field="LINKNO" expression=""/>
+    <default field="DSLINKNO" expression=""/>
+    <default field="USLINKNO1" expression=""/>
+    <default field="USLINKNO2" expression=""/>
+    <default field="DSNODEID" expression=""/>
+    <default field="strmOrder" expression=""/>
+    <default field="Length" expression=""/>
+    <default field="Magnitude" expression=""/>
+    <default field="DSContArea" expression=""/>
+    <default field="strmDrop" expression=""/>
+    <default field="Slope" expression=""/>
+    <default field="StraightL" expression=""/>
+    <default field="USContArea" expression=""/>
+    <default field="WSNO" expression=""/>
+    <default field="DOUTEND" expression=""/>
+    <default field="DOUTSTART" expression=""/>
+    <default field="DOUTMID" expression=""/>
   </defaults>
   <previewExpression></previewExpression>
 </maplayer>

@@ -4,7 +4,7 @@ BASIN_NAME := lakes basin
 POUR_POINTS := pour_points.bna
 EPSG := 32611
 MAX_EXTENT := 318520.405027 4167937.07547 329767.728206 4157522.88734
-DELINEATE_THRESHOLD := 100000
+DELINEATE_THRESHOLD := 10000 100000
 DELINEATE_RESOLUTION := 10
 NTHREADS := 2
 
@@ -18,6 +18,8 @@ ZIP:=$$(python3.6 -c "print('{}_shapefile_EPSG{}.zip'.format('$(BASIN_NAME)'.low
 
 # Rebuild the BASIN_NAME to look pretty
 BASIN_NAME:=$$(python3.6 -c "print('{}'.format('$(BASIN_NAME)'.title()).replace('_',' '))")
+
+MIN_THRESH:=$$(python3.6 -c "print('{}'.format('$(DELINEATE_THRESHOLD)'.split(' ')[0]))")
 
 all:
 	make delineate
@@ -70,10 +72,10 @@ dem_process:
 								 $(FULL_DEM) \
 								 $(DEM_IMG)
 	# Clean up some processing images
-	rm $(MOSAIC) $(FULL_DEM)
+	rm $(MOSAIC)
 
 delineate:
-	# Delineate the Tuolumne Subbasin and Lower Don Pedro
+	# Delineate the basin
 	delineate -p  $(POUR_POINTS) \
 						-d $(DEM_IMG) \
 						-t $(DELINEATE_THRESHOLD) \
@@ -83,7 +85,7 @@ delineate:
 
 topo:
 
-	# Basin Setup
+	# Generate the topo file for SMRF/AWSM
 	basin_setup -f  delineation/basin_outline.shp \
 							-bn $(BASIN_NAME) \
 							-sb delineation/*_subbasin.shp \
@@ -91,14 +93,23 @@ topo:
 							-d /Downloads
 
 gis_package:
+	# Build a GIS package for bundle zip files
 	zip $(ZIP) ./delineation/*basin_outline.* ./delineation/*_subbasin.*
 
 qgis:
+	# Make a QGIS basin project
 	# Make the dem colormap and hillshade
 	gdaldem hillshade $(DEM_IMG) ./dem/hillshade.tif
 	mkdir -p ./colormaps
+	# Make the DEM colormap
 	python3.6 scripts/make_dem_colormap.py $(DEM_IMG)
-	python3.6 scripts/make_qgis_proj.py $(DEM_IMG) ./dem/hillshade.tif ./colormaps/dem_colormap.qml -s ./delineation/*subbasin.shp
+	# Make the final project file
+	echo $(MIN_THRESH)
+	python3.6 scripts/make_qgis_proj.py $(DEM_IMG) \
+																			./dem/hillshade.tif \
+																			./colormaps/dem_colormap.qml \
+																			-s ./delineation/*basin*.shp \
+																			./delineation/streamflow/thresh_$(MIN_THRESH)/net_thresh_*.shp
 
 clean_all:
 	rm -rf dem basin_setup delineation

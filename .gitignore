@@ -35,5 +35,6 @@
 /topo_management/setting_up_a_basin/new_basin/dem/*
 /topo_management/setting_up_a_basin/new_basin/basin_setup/*
 /topo_management/setting_up_a_basin/new_basin/delineation/*
+/topo_management/setting_up_a_basin/new_basin/*.zip
 /topo_management/setting_up_a_basin/new_basin/*.qgs
 /topo_management/veg_type_colormap/*.qml
