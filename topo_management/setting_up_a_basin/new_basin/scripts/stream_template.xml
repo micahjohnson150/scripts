@@ -5,12 +5,12 @@
     <xmax>326163.58597841823939234</xmax>
     <ymax>4165853.23840176127851009</ymax>
   </extent>
-  <id>[SHAPEFILE_NAME][ID]</id>
-  <datasource>[SHAPEFILE_PATH]</datasource>
+  <id>[NAME][ID]</id>
+  <datasource>[PATH]</datasource>
   <keywordList>
     <value></value>
   </keywordList>
-  <layername>[SHAPEFILE_NAME]</layername>
+  <layername>[NAME]</layername>
   <srs>
     <spatialrefsys>
       <proj4>+proj=utm +zone=11 +datum=WGS84 +units=m +no_defs</proj4>

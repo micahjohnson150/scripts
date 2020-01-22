@@ -29,8 +29,8 @@ cm_types = {'water':        {'alpha':norm, 'color':[0, 50, 78], 'tags':['water']
             'lush':         {'alpha':norm, 'color':[58, 95, 11],'tags':['meadow','riparian']},
             # 'bush':         {'alpha':norm, 'color':[0, 144, 64], 'tags':['shrub']},
             }
-df = df.set_index('VALUE')
-
+df = df.set_index('VALUE').sort_index()
+print(df)
 print("Creating a new colormap for QGIS based on the DEM found in the topos")
 
 # Upper portion of the style file right up to the color ramp

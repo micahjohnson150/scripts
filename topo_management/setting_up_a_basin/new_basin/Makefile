@@ -106,9 +106,10 @@ qgis:
 	# Make the final project file
 	echo $(MIN_THRESH)
 	python3.6 scripts/make_qgis_proj.py -t $(DEM_IMG) \
-																				 ./dem/hillshade.tif \
+																			./dem/hillshade.tif \
 																			-s ./delineation/*basin*.shp \
-																			./delineation/streamflow/thresh_$(MIN_THRESH)/net_thresh_*.shp
-
+																			./delineation/streamflow/thresh_$(MIN_THRESH)/net_thresh_*.shp \
+																			-n basin_setup/topo.nc \
+																			-v veg_type dem
 clean_all:
 	rm -rf dem basin_setup delineation

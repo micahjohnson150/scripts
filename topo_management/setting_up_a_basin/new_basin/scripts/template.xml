@@ -5,8 +5,7 @@
   <evaluateDefaultValues active="0"/>
   <layer-tree-group expanded="1" checked="Qt::Checked" name="">
     <customproperties/>
-[SHAPEFILE_DECLARATIONS]
-[RASTER_DECLARATIONS]
+[DECLARATIONS]
   </layer-tree-group>
   <relations/>
   <mapcanvas>
@@ -36,25 +35,14 @@
   </mapcanvas>
   <layer-tree-canvas>
     <custom-order enabled="0">
-[SHAPEFILE_ORDER]
-[RASTER_ORDER]
+[ORDER]
     </custom-order>
   </layer-tree-canvas>
   <legend updateDrawingOrder="true">
-    <!-- <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="[DEM_NAME]" showFeatureCount="0">
-      <filegroup open="true" hidden="false">
-        <legendlayerfile isInOverview="0" layerid="[DEM_NAME][ID]" visible="1"/>
-      </filegroup>
-    </legendlayer>
-    <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="[HILLSHADE_NAME]" showFeatureCount="0">
-      <filegroup open="true" hidden="false">
-        <legendlayerfile isInOverview="0" layerid="[HILLSHADE_NAME][ID]" visible="1"/>
-      </filegroup>
-    </legendlayer> -->
+[LEGEND]
   </legend>
   <projectlayers>
-[SHAPEFILE_LAYERS]
-[RASTER_LAYERS]
+[LAYERS]
   </projectlayers>
   <properties>
     <Measurement>

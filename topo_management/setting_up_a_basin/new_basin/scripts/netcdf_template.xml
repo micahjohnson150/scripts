@@ -1,22 +1,22 @@
-<maplayer minimumScale="0" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
+<maplayer minimumScale="inf" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
   <extent>
-    <xmin>318520.40502700000070035</xmin>
-    <ymin>4157522.88733999989926815</ymin>
-    <xmax>329767.72820599999977276</xmax>
-    <ymax>4167937.0754700000397861</ymax>
+    <xmin>320004.125</xmin>
+    <ymin>4158330</ymin>
+    <xmax>327754.125</xmax>
+    <ymax>4166680</ymax>
   </extent>
-  <id>[NAME][ID]</id>
-  <datasource>[PATH]</datasource>
+  <id>NETCDF__[NAME]__[VARIABLE][ID]</id>
+  <datasource>NETCDF:"[PATH]":[VARIABLE]</datasource>
   <keywordList>
     <value></value>
   </keywordList>
-  <layername>[NAME]</layername>
+  <layername>NETCDF:"[NAME]":[VARIABLE]</layername>
   <srs>
     <spatialrefsys>
       <proj4>+proj=utm +zone=11 +datum=WGS84 +units=m +no_defs</proj4>
       <srsid>3095</srsid>
-      <srid>[EPSG]</srid>
-      <authid>EPSG:[EPSG]</authid>
+      <srid>32611</srid>
+      <authid>EPSG:32611</authid>
       <description>WGS 84 / UTM zone 11N</description>
       <projectionacronym>utm</projectionacronym>
       <ellipsoidacronym>WGS84</ellipsoidacronym>
@@ -24,6 +24,7 @@
     </spatialrefsys>
   </srs>
   <customproperties>
+    <property key="embeddedWidgets/count" value="0"/>
     <property key="identify/format" value="Value"/>
   </customproperties>
   <provider>gdal</provider>
@@ -34,7 +35,7 @@
     <map-layer-style name=""/>
   </map-layer-style-manager>
   <pipe>
-[COLOR]
+    [COLOR]
   </pipe>
   <blendMode>0</blendMode>
 </maplayer>
