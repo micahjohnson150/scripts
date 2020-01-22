@@ -5,13 +5,8 @@
   <evaluateDefaultValues active="0"/>
   <layer-tree-group expanded="1" checked="Qt::Checked" name="">
     <customproperties/>
-[SHAPEFILE_DECLARATATION]
-    <layer-tree-layer expanded="1" providerKey="gdal" checked="Qt::Checked" id="[DEM_NAME][ID]" source="[DEM_PATH]" name="[DEM_NAME]">
-    <customproperties/>
-    </layer-tree-layer>
-    <layer-tree-layer expanded="1" providerKey="gdal" checked="Qt::Checked" id="[HILLSHADE_NAME][ID]" source="[HILLSHADE_PATH]" name="[HILLSHADE_NAME]">
-      <customproperties/>
-    </layer-tree-layer>
+[SHAPEFILE_DECLARATIONS]
+[RASTER_DECLARATIONS]
   </layer-tree-group>
   <relations/>
   <mapcanvas>
@@ -42,12 +37,11 @@
   <layer-tree-canvas>
     <custom-order enabled="0">
 [SHAPEFILE_ORDER]
-      <item>[HILLSHADE_NAME][ID]</item>
-      <item>[DEM_NAME][ID]</item>
+[RASTER_ORDER]
     </custom-order>
   </layer-tree-canvas>
   <legend updateDrawingOrder="true">
-    <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="[DEM_NAME]" showFeatureCount="0">
+    <!-- <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="[DEM_NAME]" showFeatureCount="0">
       <filegroup open="true" hidden="false">
         <legendlayerfile isInOverview="0" layerid="[DEM_NAME][ID]" visible="1"/>
       </filegroup>
@@ -56,100 +50,11 @@
       <filegroup open="true" hidden="false">
         <legendlayerfile isInOverview="0" layerid="[HILLSHADE_NAME][ID]" visible="1"/>
       </filegroup>
-    </legendlayer>
+    </legendlayer> -->
   </legend>
   <projectlayers>
 [SHAPEFILE_LAYERS]
-    <maplayer minimumScale="0" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
-      <extent>
-        <xmin>318520.40502700000070035</xmin>
-        <ymin>4157522.88733999989926815</ymin>
-        <xmax>329767.72820599999977276</xmax>
-        <ymax>4167937.0754700000397861</ymax>
-      </extent>
-      <id>[HILLSHADE_NAME][ID]</id>
-      <datasource>[HILLSHADE_PATH]</datasource>
-      <keywordList>
-        <value></value>
-      </keywordList>
-      <layername>[HILLSHADE_NAME]</layername>
-      <srs>
-        <spatialrefsys>
-          <proj4>+proj=utm +zone=11 +datum=WGS84 +units=m +no_defs</proj4>
-          <srsid>3095</srsid>
-          <srid>[EPSG]</srid>
-          <authid>EPSG:[EPSG]</authid>
-          <description>WGS 84 / UTM zone 11N</description>
-          <projectionacronym>utm</projectionacronym>
-          <ellipsoidacronym>WGS84</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
-        </spatialrefsys>
-      </srs>
-      <customproperties>
-        <property key="identify/format" value="Value"/>
-      </customproperties>
-      <provider>gdal</provider>
-      <noData>
-        <noDataList bandNo="1" useSrcNoData="1"/>
-      </noData>
-      <map-layer-style-manager current="">
-        <map-layer-style name=""/>
-      </map-layer-style-manager>
-      <pipe>
-        <rasterrenderer gradient="BlackToWhite" opacity="1" alphaBand="-1" type="singlebandgray" grayBand="1">
-          <rasterTransparency/>
-          <contrastEnhancement>
-            <minValue>58</minValue>
-            <maxValue>241</maxValue>
-            <algorithm>StretchToMinimumMaximum</algorithm>
-          </contrastEnhancement>
-        </rasterrenderer>
-        <brightnesscontrast brightness="0" contrast="0"/>
-        <huesaturation colorizeGreen="128" colorizeOn="0" colorizeRed="255" colorizeBlue="128" grayscaleMode="0" saturation="0" colorizeStrength="100"/>
-        <rasterresampler maxOversampling="2"/>
-      </pipe>
-      <blendMode>0</blendMode>
-    </maplayer>
-    <maplayer minimumScale="inf" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
-      <extent>
-        <xmin>318520.40502700000070035</xmin>
-        <ymin>4157522.88733999989926815</ymin>
-        <xmax>329767.72820599999977276</xmax>
-        <ymax>4167937.0754700000397861</ymax>
-      </extent>
-      <id>[DEM_NAME][ID]</id>
-      <datasource>[DEM_PATH]</datasource>
-      <keywordList>
-        <value></value>
-      </keywordList>
-      <layername>[DEM_NAME]</layername>
-      <srs>
-        <spatialrefsys>
-          <proj4>[PROJ4]</proj4>
-          <srsid>3095</srsid>
-          <srid>[EPSG]</srid>
-          <authid>EPSG:[EPSG]</authid>
-          <projectionacronym>utm</projectionacronym>
-          <ellipsoidacronym>WGS84</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
-        </spatialrefsys>
-      </srs>
-      <customproperties>
-        <property key="embeddedWidgets/count" value="0"/>
-        <property key="identify/format" value="Value"/>
-      </customproperties>
-      <provider>gdal</provider>
-      <noData>
-        <noDataList bandNo="1" useSrcNoData="0"/>
-      </noData>
-      <map-layer-style-manager current="">
-        <map-layer-style name=""/>
-      </map-layer-style-manager>
-      <pipe>
-[DEM_COLORMAP]
-      </pipe>
-      <blendMode>0</blendMode>
-    </maplayer>
+[RASTER_LAYERS]
   </projectlayers>
   <properties>
     <Measurement>

@@ -105,9 +105,8 @@ qgis:
 	python3.6 scripts/make_dem_colormap.py $(DEM_IMG)
 	# Make the final project file
 	echo $(MIN_THRESH)
-	python3.6 scripts/make_qgis_proj.py $(DEM_IMG) \
-																			./dem/hillshade.tif \
-																			./colormaps/dem_colormap.qml \
+	python3.6 scripts/make_qgis_proj.py -t $(DEM_IMG) \
+																				 ./dem/hillshade.tif \
 																			-s ./delineation/*basin*.shp \
 																			./delineation/streamflow/thresh_$(MIN_THRESH)/net_thresh_*.shp
 

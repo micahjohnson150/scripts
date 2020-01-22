@@ -1,0 +1,40 @@
+<maplayer minimumScale="0" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
+  <extent>
+    <xmin>318520.40502700000070035</xmin>
+    <ymin>4157522.88733999989926815</ymin>
+    <xmax>329767.72820599999977276</xmax>
+    <ymax>4167937.0754700000397861</ymax>
+  </extent>
+  <id>[NAME][ID]</id>
+  <datasource>[PATH]</datasource>
+  <keywordList>
+    <value></value>
+  </keywordList>
+  <layername>[NAME]</layername>
+  <srs>
+    <spatialrefsys>
+      <proj4>+proj=utm +zone=11 +datum=WGS84 +units=m +no_defs</proj4>
+      <srsid>3095</srsid>
+      <srid>[EPSG]</srid>
+      <authid>EPSG:[EPSG]</authid>
+      <description>WGS 84 / UTM zone 11N</description>
+      <projectionacronym>utm</projectionacronym>
+      <ellipsoidacronym>WGS84</ellipsoidacronym>
+      <geographicflag>false</geographicflag>
+    </spatialrefsys>
+  </srs>
+  <customproperties>
+    <property key="identify/format" value="Value"/>
+  </customproperties>
+  <provider>gdal</provider>
+  <noData>
+    <noDataList bandNo="1" useSrcNoData="1"/>
+  </noData>
+  <map-layer-style-manager current="">
+    <map-layer-style name=""/>
+  </map-layer-style-manager>
+  <pipe>
+[COLOR_MAP]
+  </pipe>
+  <blendMode>0</blendMode>
+</maplayer>

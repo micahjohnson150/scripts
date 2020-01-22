@@ -1,10 +1,10 @@
-<maplayer simplifyAlgorithm="0" minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" readOnly="0" geometry="[SHAPEFILE_TYPE]" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
-  <id>[SHAPEFILE_NAME][ID]</id>
-  <datasource>[SHAPEFILE_PATH]</datasource>
+<maplayer simplifyAlgorithm="0" minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" readOnly="0" geometry="[LINE_TYPE]" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
+  <id>[NAME][ID]</id>
+  <datasource>[PATH]</datasource>
   <keywordList>
     <value></value>
   </keywordList>
-  <layername>[SHAPEFILE_NAME]</layername>
+  <layername>[NAME]</layername>
   <srs>
     <spatialrefsys>
       <proj4>+proj=utm +zone=11 +datum=WGS84 +units=m +no_defs</proj4>
@@ -34,7 +34,7 @@
       <symbol alpha="1" clip_to_extent="1" type="fill" name="0">
         <layer pass="0" class="SimpleFill" locked="0">
           <prop k="border_width_map_unit_scale" v="0,0,0,0,0,0"/>
-          <prop k="color" v="[SHAPEFILE_COLOR]"/>
+          <prop k="color" v="[COLOR]"/>
           <prop k="joinstyle" v="bevel"/>
           <prop k="offset" v="0,0"/>
           <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
