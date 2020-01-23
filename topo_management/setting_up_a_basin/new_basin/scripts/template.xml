@@ -20,13 +20,12 @@
     <projections>0</projections>
     <destinationsrs>
       <spatialrefsys>
-        <proj4>+proj=utm +zone=11 +datum=WGS84 +units=m +no_defs</proj4>
-        <srsid>3095</srsid>
+        <proj4>[PROJ4]</proj4>
         <srid>[EPSG]</srid>
         <authid>EPSG:[EPSG]</authid>
-        <description>WGS 84 / UTM zone 11N</description>
+        <description>[DATUM] / UTM zone [ZONE]N</description>
         <projectionacronym>utm</projectionacronym>
-        <ellipsoidacronym>WGS84</ellipsoidacronym>
+        <ellipsoidacronym>[DATUM_NO_SPACE]</ellipsoidacronym>
         <geographicflag>false</geographicflag>
       </spatialrefsys>
     </destinationsrs>
@@ -49,11 +48,6 @@
       <DistanceUnits type="QString">meters</DistanceUnits>
       <AreaUnits type="QString">m2</AreaUnits>
     </Measurement>
-    <SpatialRefSys>
-      <ProjectCRSProj4String type="QString">+proj=utm +zone=11 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</ProjectCRSProj4String>
-      <ProjectCrs type="QString">EPSG:26911</ProjectCrs>
-      <ProjectCRSID type="int">2288</ProjectCRSID>
-    </SpatialRefSys>
     <Paths>
       <Absolute type="bool">false</Absolute>
     </Paths>

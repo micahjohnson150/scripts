@@ -2,6 +2,44 @@ import datetime
 import argparse
 from os.path import basename, split
 import pprint
+import requests
+
+def get_xml_spatial_ref(epsg):
+    """
+    Construct a string representing how QGIS wants the spatial info
+
+    Returns:
+        spatial: String containing a XML representation of the projection
+    """
+    url = "https://spatialreference.org/ref/epsg/{}/proj4/".format(epsg)
+    r = requests.get(url)
+    proj4 = r.text.strip()
+    data = {}
+
+    for value in proj4.split(" "):
+        if 'no_def' not in value:
+            val_str = value.replace('+','')
+            k,v = val_str.split("=")
+            data[k] = str(v)
+
+    sp_ref = (
+    '\t\t\t<spatialrefsys>\n'
+    '\t\t\t\t<proj4>[PROJ4]</proj4>\n'
+    '\t\t\t\t<srid>[EPSG]</srid>\n'
+    '\t\t\t\t<authid>EPSG:[EPSG]</authid>\n'
+    '\t\t\t\t<description>[DATUM] / UTM zone [ZONE]N</description>\n'
+    '\t\t\t\t<projectionacronym>utm</projectionacronym>\n'
+    '\t\t\t\t<ellipsoidacronym>[DATUM_NO_SPACE]</ellipsoidacronym>\n'
+    '\t\t\t\t<geographicflag>false</geographicflag>\n'
+    '\t\t\t</spatialrefsys>\n')
+
+    replacement = {"PROJ4": proj4,
+                   "EPSG":str(epsg),
+                   "DATUM":data['ellps'],
+                   "DATUM_NO_SPACE":data['ellps'].replace(" ",'').capitalize()
+                   }
+    return replacement
+
 
 def str_swap(str_raw, replace_dict):
     """
@@ -225,11 +263,12 @@ def create_layer_strings(files, epsg, variables=[], declarations='', order='', l
         declarations: String for adding on to provided to force the order of a layer if need be
         order: String for adding on to provided to force the order of a layer if need be
         layers: String for adding on to provided to force the order of a layer if need be
-
+        legend: String for extending to force the order of a legend entry
     Returns:
         declarations: String representing layer declarations
         order: String representing order string in the project file
         layers: String representing the layer definitions
+        legend: String representing the legend entries
     """
     if type(files) != list:
         files = [files]
@@ -303,7 +342,7 @@ def main():
     "LAYERS": layers,
     "LEGEND": legend,
     }
-
+    replacements.update(get_xml_spatial_ref(epsg))
     # Open the template
     fname = './scripts/template.xml'
 
