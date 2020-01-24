@@ -4,10 +4,14 @@ BASIN_NAME := lakes basin
 POUR_POINTS := pour_points.bna
 EPSG := 32611
 
+# LEFT UPPER, RIGHT BOTTOM
 MAX_EXTENT := 318520.405027 4167937.07547 329767.728206 4157522.88734
 DELINEATE_THRESHOLD := 10000 100000
 DELINEATE_RESOLUTION := 10
 NTHREADS := 2
+
+# LEFT BOTTOM RIGHT TOP
+# BASIN_EXTENT := 283967.6875 4050545 381092 4120020
 ################################################################################
 
 # Build the dem file name
@@ -38,9 +42,10 @@ init:
 						-n $(NTHREADS) \
 						-strm
 	make topo
-	make qgis_data
+	make qgis
+	make gis_package
 
-# Downlaod the dems in the source file
+# Download the dems in the source file
 download_dem:
 	# Make a directory and download data to it from the National Elevation Dataset
 	mkdir -p dem
@@ -119,6 +124,7 @@ qgis:
 																			./delineation/*basin*.shp \
 																			./delineation/streamflow/thresh_$(MIN_THRESH)/net_thresh_*.shp \
 																			-n basin_setup/topo.nc \
+																			# --extent $(BASIN_EXTENT)
 																			-v veg_type dem
 clean_all:
 	rm -rf dem basin_setup delineation

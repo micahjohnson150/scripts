@@ -48,7 +48,7 @@ much concern for raising errors. They are described in the table below:
 | **POUR_POINTS**              | BNA file containing names of pour points which is used to name subbasins, Coordinates must be in EPSG Coordinates
 | **EPSG**                     | EPSG code representing the projection information. Currently AWSM only supports UTM
 | **MAX_EXTENT**               | Maximum extent to delineate on for the dem. Must be in same Coordinates as EPSG
-| **DELINEATE_THRESHOLD**      | Number of cells draining into an area to constitute a subbasin (Bigger # == Bigger Subbasins)
+| **DELINEATE_THRESHOLD**      | Number of cells draining into an area to constitute a subbasin (Bigger # == Bigger Subbasins). Its recommended once you find a threashold that works, divide it by ten adn add it to the beginning of the list here to add nice looking streams to the QGIS project
 | **DELINEATE_RESOLUTION**     | Cellsize resolution used for delineation (Meters)
 | **NTHREADS**                 | Number of processes to launch for delineating the basin
 
