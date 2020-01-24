@@ -23,6 +23,17 @@ e.g.
 """
 out = Messages()
 
+def has_hidden_dirs(p):
+    """
+    Searches a string path to determine if there are hidden
+    """
+    has_hidden_paths = False
+    for d in p.split('/'):
+        if d:
+            if d[0] == '.':
+                has_hidden_paths = True
+    return has_hidden_paths
+
 
 def find_basin_paths(directory, indicator_folder="model_setup", indicator_file="Makefile"):
     """
@@ -33,12 +44,31 @@ def find_basin_paths(directory, indicator_folder="model_setup", indicator_file="
     paths = []
     directory = abspath(expanduser(directory))
 
+    # Allow for indicator files and dirs to be none
+    no_ind_file = (indicator_folder == None and indicator_file != None)
+    no_ind_dir = (indicator_folder != None and indicator_file == None)
+    no_dir_or_file = (indicator_folder == None and indicator_file == None)
+
     # Get all the folders and stuff just one level up
     for r, d, f in walk(directory):
-        if basename(r) == indicator_folder:
 
-            if indicator_file in f:
+        # ignore hidden folders and the top level folder
+        if not has_hidden_dirs(r) and r != directory:
+            if (
+               # If no indicator file or directories append the path
+               no_dir_or_file or \
+
+               # no indicatory file is available only check the indicator folder
+               (no_ind_file and basename(r) == indicator_folder) or \
+
+               # if no indicator folder is available only check file
+               (no_ind_dir and indicator_file in f) or \
+
+               # Look for both the indicator file and folder
+               (basename(r) == indicator_folder and indicator_file in f)):
+
                 paths.append(r)
+
 
     return paths
 
