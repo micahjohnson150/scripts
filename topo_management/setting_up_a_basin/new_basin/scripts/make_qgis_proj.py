@@ -1,3 +1,15 @@
+"""
+Script attempts to rebuild qgis projects using hackish templates made in
+qgis. The projects are soley focused on highlight delineation and looking
+at the static files going in to AWSM/SMRF
+
+For help on usage:
+    python make_qgis_proj.py --help
+
+Author: Micah Johnson
+Last Date Modified: 01-24-2020
+"""
+
 import datetime
 import argparse
 from os.path import basename, split, join

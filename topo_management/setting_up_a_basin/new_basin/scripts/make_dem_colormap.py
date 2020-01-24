@@ -1,11 +1,15 @@
 """
-Generate a dem_style.qml
+Generate a dem_style.qml. These are best loaded in to QGIS using the properties
+menu under the styles tab
 
 usage:
     python make_dem_colormap.py dem.tif
 
 output:
     a style file written to dem_style.qml
+
+Author: Micah Johnson
+Last Date Modified: 01-24-2020
 """
 
 from subprocess import check_output

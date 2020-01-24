@@ -1,13 +1,25 @@
 """
 Reads the CSV in the land fire data set and attempts to make a colormap on the
-veg description for the csv
+veg description for the csv. This assumes you have the landfire data set
+downloaded
+
+Usage:
+    python make_veg_type_colormap.py
+
+Author: Micah Johnson
+Last Date Modified: 01-24-2020
 """
 
 import pandas as pd
 import numpy as np
 from collections import OrderedDict
 
+
+######## Change me if you want to run this outside of the docker ###############
 fname = "/Downloads/US_140EVT_20180618/CSV_Data/LF_140EVT_09152016.csv"
+################################################################################
+
+
 
 print("Creating a new colormap for QGIS based on the vegetation type values.")
 
