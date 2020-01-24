@@ -3,10 +3,10 @@ DEM_SOURCE := dem_sources.txt
 BASIN_NAME := lakes basin
 POUR_POINTS := pour_points.bna
 EPSG := 32611
+
 MAX_EXTENT := 318520.405027 4167937.07547 329767.728206 4157522.88734
 DELINEATE_THRESHOLD := 10000 100000
 DELINEATE_RESOLUTION := 10
-NTHREADS := 2
 
 ################################################################################
 
@@ -107,7 +107,8 @@ qgis:
 	echo $(MIN_THRESH)
 	python3.6 scripts/make_qgis_proj.py -t $(DEM_IMG) \
 																			./dem/hillshade.tif \
-																			-s ./delineation/*basin*.shp \
+																			-s $(POUR_POINTS) \
+																			./delineation/*basin*.shp \
 																			./delineation/streamflow/thresh_$(MIN_THRESH)/net_thresh_*.shp \
 																			-n basin_setup/topo.nc \
 																			-v veg_type dem

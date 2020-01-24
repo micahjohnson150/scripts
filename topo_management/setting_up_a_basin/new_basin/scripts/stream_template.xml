@@ -12,16 +12,7 @@
   </keywordList>
   <layername>[NAME]</layername>
   <srs>
-    <spatialrefsys>
-      <proj4>+proj=utm +zone=11 +datum=WGS84 +units=m +no_defs</proj4>
-      <srsid>3095</srsid>
-      <srid>[EPSG]</srid>
-      <authid>EPSG:[EPSG]</authid>
-      <description>WGS 84 / UTM zone 11N</description>
-      <projectionacronym>utm</projectionacronym>
-      <ellipsoidacronym>WGS84</ellipsoidacronym>
-      <geographicflag>false</geographicflag>
-    </spatialrefsys>
+    [SPATIAL_REF]
   </srs>
   <provider encoding="System">ogr</provider>
   <vectorjoins/>

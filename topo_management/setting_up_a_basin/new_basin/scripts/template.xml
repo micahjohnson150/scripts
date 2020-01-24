@@ -19,15 +19,7 @@
     <rotation>0</rotation>
     <projections>0</projections>
     <destinationsrs>
-      <spatialrefsys>
-        <proj4>[PROJ4]</proj4>
-        <srid>[EPSG]</srid>
-        <authid>EPSG:[EPSG]</authid>
-        <description>[DATUM] / UTM zone [ZONE]N</description>
-        <projectionacronym>utm</projectionacronym>
-        <ellipsoidacronym>[DATUM_NO_SPACE]</ellipsoidacronym>
-        <geographicflag>false</geographicflag>
-      </spatialrefsys>
+[SPATIAL_REF]
     </destinationsrs>
     <rendermaptile>0</rendermaptile>
     <layer_coordinate_transform_info/>

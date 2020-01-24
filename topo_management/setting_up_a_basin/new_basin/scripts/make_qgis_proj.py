@@ -25,7 +25,6 @@ def get_xml_spatial_ref(epsg):
     sp_ref = (
     '\t\t\t<spatialrefsys>\n'
     '\t\t\t\t<proj4>[PROJ4]</proj4>\n'
-    '\t\t\t\t<srid>[EPSG]</srid>\n'
     '\t\t\t\t<authid>EPSG:[EPSG]</authid>\n'
     '\t\t\t\t<description>[DATUM] / UTM zone [ZONE]N</description>\n'
     '\t\t\t\t<projectionacronym>utm</projectionacronym>\n'
@@ -38,7 +37,7 @@ def get_xml_spatial_ref(epsg):
                    "DATUM":data['ellps'],
                    "DATUM_NO_SPACE":data['ellps'].replace(" ",'').capitalize()
                    }
-    return replacement
+    return str_swap(sp_ref, replacement)
 
 
 def str_swap(str_raw, replace_dict):
@@ -114,7 +113,7 @@ class QGISLayerMaker(object):
         self.ext = path.split('.')[-1]
 
         # Assign a provider and layer_template based on the file ext
-        if self.ext == 'shp':
+        if self.ext == 'shp' or self.ext == 'bna':
             self.ftype = 'shapefile'
             provider = 'ogr'
 
@@ -122,6 +121,10 @@ class QGISLayerMaker(object):
             if "net_thresh" in path:
                 line_type = 'Line'
                 template = './scripts/stream_template.xml'
+
+            elif 'points' in path:
+                line_type = 'Point'
+                template = './scripts/points_template.xml'
 
             # Polygon
             else:
@@ -216,6 +219,9 @@ class QGISLayerMaker(object):
         elif "net_thresh" in search_str:
             # Dark blue for streams
             color = "0,50,78,0"
+
+        elif 'pour' in search_str:
+            color = "0,227,72,255"
 
         # Basin/subbasin
         elif 'basin' in search_str:
@@ -342,7 +348,8 @@ def main():
     "LAYERS": layers,
     "LEGEND": legend,
     }
-    replacements.update(get_xml_spatial_ref(epsg))
+    replacements['SPATIAL_REF'] = get_xml_spatial_ref(epsg)
+
     # Open the template
     fname = './scripts/template.xml'
 
