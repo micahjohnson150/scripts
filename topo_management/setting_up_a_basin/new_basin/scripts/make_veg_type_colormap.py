@@ -7,11 +7,11 @@ import pandas as pd
 import numpy as np
 from collections import OrderedDict
 
-fname = "~/Downloads/US_140EVT_20180618/CSV_Data/LF_140EVT_09152016.csv"
+fname = "/Downloads/US_140EVT_20180618/CSV_Data/LF_140EVT_09152016.csv"
 
 print("Creating a new colormap for QGIS based on the vegetation type values.")
 
-output = "./veg_colormap.qml"
+output = "./colormaps/veg_colormap.qml"
 
 
 print("Parsing vegetation types...")
@@ -30,7 +30,6 @@ cm_types = {'water':        {'alpha':200, 'color':[0, 50, 78], 'tags':['water']}
             # 'bush':         {'alpha':norm, 'color':[0, 144, 64], 'tags':['shrub']},
             }
 df = df.set_index('VALUE').sort_index()
-print(df)
 print("Creating a new colormap for QGIS based on the DEM found in the topos")
 
 # Upper portion of the style file right up to the color ramp

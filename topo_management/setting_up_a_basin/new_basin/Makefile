@@ -101,8 +101,16 @@ qgis:
 	# Make the dem colormap and hillshade
 	gdaldem hillshade $(DEM_IMG) ./dem/hillshade.tif
 	mkdir -p ./colormaps
+
 	# Make the DEM colormap
-	python3.6 scripts/make_dem_colormap.py $(DEM_IMG)
+	python3.6 ./scripts/make_dem_colormap.py $(DEM_IMG)
+
+	# Make the Vegetation colormap
+	python3.6 ./scripts/make_veg_type_colormap.py
+
+	# move the hillshade colormap over
+	cp scripts/qgis_templates/hillshade.xml colormaps/hillshade.qml
+
 	# Make the final project file
 	echo $(MIN_THRESH)
 	python3.6 scripts/make_qgis_proj.py -t $(DEM_IMG) \

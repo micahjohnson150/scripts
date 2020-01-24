@@ -1,6 +1,6 @@
 import datetime
 import argparse
-from os.path import basename, split
+from os.path import basename, split, join
 import pprint
 import requests
 
@@ -80,7 +80,7 @@ def get_now_str():
     return str_now
 
 class QGISLayerMaker(object):
-    def __init__(self, path, epsg, **kwargs):
+    def __init__(self, path, epsg, template_dir='./scripts/qgis_templates', **kwargs):
         """
         Adds a layer to a QGIS project in a hacky XML copy and paste way
         This class is meant to be inherited from with modifications to the
@@ -91,7 +91,7 @@ class QGISLayerMaker(object):
 
         # Template declaration for a layer. Is inserted near the top of project
         self.declaration =(
-        '\t\t<layer-tree-layer expanded="1" providerKey="[PROVIDER]" '
+        '\t\t<layer-tree-layer expanded="0" providerKey="[PROVIDER]" '
         'checked="Qt::Checked" id="[NAME][ID]" source="[PATH]" name="[NAME]">\n'
         '\t\t\t<customproperties/>\n'
         '\t\t</layer-tree-layer>\n')
@@ -112,6 +112,7 @@ class QGISLayerMaker(object):
         # Grab file extension
         self.ext = path.split('.')[-1]
 
+
         # Assign a provider and layer_template based on the file ext
         if self.ext == 'shp' or self.ext == 'bna':
             self.ftype = 'shapefile'
@@ -120,16 +121,16 @@ class QGISLayerMaker(object):
             # line
             if "net_thresh" in path:
                 line_type = 'Line'
-                template = './scripts/stream_template.xml'
+                template = join(template_dir, 'stream_template.xml')
 
             elif 'points' in path:
                 line_type = 'Point'
-                template = './scripts/points_template.xml'
+                template = join(template_dir, 'points_template.xml')
 
             # Polygon
             else:
                 line_type = 'Polygon'
-                template = './scripts/shapefile_template.xml'
+                template = join(template_dir, 'shapefile_template.xml')
 
             self.replacements = {"PATH": path,
                                 "NAME": name,
@@ -142,7 +143,7 @@ class QGISLayerMaker(object):
             self.ftype = 'geotiff'
             ftype = 'geotiff'
             provider = 'gdal'
-            template = './scripts/raster_template.xml'
+            template = join(template_dir, 'raster_template.xml')
 
             self.replacements = {"PATH": path,
                                 "NAME": name,
@@ -154,10 +155,10 @@ class QGISLayerMaker(object):
         elif self.ext == 'nc':
             self.ftype = 'netcdf'
             provider = 'gdal'
-            template = './scripts/netcdf_template.xml'
+            template = join(template_dir, 'netcdf_template.xml')
 
             self.declaration = (
-                '\t\t<layer-tree-layer expanded="1" providerKey="gdal"'
+                '\t\t<layer-tree-layer expanded="0" providerKey="gdal" '
                 'checked="Qt::Checked" id="NETCDF__[NAME]__[VARIABLE][ID]" '
                 'source="NETCDF:&quot;[PATH]&quot;:[NC_VAR]" name="NETCDF:'
                 '&quot;[NAME]&quot;:[VARIABLE]">\n'
@@ -349,9 +350,9 @@ def main():
     "LEGEND": legend,
     }
     replacements['SPATIAL_REF'] = get_xml_spatial_ref(epsg)
-
+    template_dir = './scripts/qgis_templates'
     # Open the template
-    fname = './scripts/template.xml'
+    fname = join(template_dir, 'template.xml')
 
     with open(fname,'r') as fp:
         lines = fp.readlines()
