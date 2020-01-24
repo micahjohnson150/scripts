@@ -19,7 +19,7 @@ df = pd.read_csv(fname)
 
 stats = {"minimum":df['VALUE'].min(), "maximum": df['VALUE'].max()}
 norm = 100
-cm_types = {'water':        {'alpha':norm, 'color':[0, 50, 78], 'tags':['water']},
+cm_types = {'water':        {'alpha':200, 'color':[0, 50, 78], 'tags':['water']},
             'forest':       {'alpha':norm, 'color':[1, 68, 33],'tags':['forest']},
             'sage':         {'alpha':norm,'color':[161, 168, 143],'tags':['sagebrush']},
             'snow':         {'alpha':norm,'color':[255, 231, 228],'tags':['snow']},
@@ -50,7 +50,6 @@ footer = """
       </rastershader>
     </rasterrenderer>
     <brightnesscontrast brightness="0" contrast="0"/>
-    <huesaturation colorizeGreen="128" colorizeOn="0" colorizeRed="255" colorizeBlue="128" grayscaleMode="0" saturation="0" colorizeStrength="100"/>
     <rasterresampler maxOversampling="2"/>
   </pipe>
   <blendMode>0</blendMode>
