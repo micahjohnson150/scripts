@@ -1,9 +1,6 @@
 <maplayer simplifyAlgorithm="0" minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" readOnly="0" geometry="Line" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
   <extent>
-    <xmin>321524.69001836841925979</xmin>
-    <ymin>4159516.77460673218593001</ymin>
-    <xmax>326163.58597841823939234</xmax>
-    <ymax>4165853.23840176127851009</ymax>
+[EXTENT]
   </extent>
   <id>[NAME][ID]</id>
   <datasource>[PATH]</datasource>

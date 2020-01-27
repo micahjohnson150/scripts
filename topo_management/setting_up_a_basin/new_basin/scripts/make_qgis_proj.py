@@ -15,6 +15,8 @@ import argparse
 from os.path import basename, split, join
 import pprint
 import requests
+from basin_setup.basin_setup import parse_extent
+
 
 def get_xml_spatial_ref(epsg):
     """
@@ -47,9 +49,41 @@ def get_xml_spatial_ref(epsg):
     replacement = {"PROJ4": proj4,
                    "EPSG":str(epsg),
                    "DATUM":data['ellps'],
-                   "DATUM_NO_SPACE":data['ellps'].replace(" ",'').capitalize()
+                   "DATUM_NO_SPACE":data['ellps'].replace(" ",'').upper(),
+                   "ZONE":data['zone']
                    }
     return str_swap(sp_ref, replacement)
+
+def get_extent_str(fname):
+    """
+    Parse the extent of a file and provide QGIS with the extents in
+    xml format
+    """
+    if fname.split('.')[-1] == 'bna':
+        with open(fname) as fp:
+            lines = fp.readlines()
+            fp.close()
+        x = []
+        y = []
+        for l in lines:
+            #Ignore any lines with quotes in it
+            if '"' not in l:
+                cx,cy = (float(c) for c in l.strip().split(','))
+                x.append(cx)
+                y.append(cy)
+        xmin = min(x)
+        xmax = max(x)
+        ymin = min(y)
+        ymax = max(y)
+
+    else:
+        xmin, ymin, xmax, ymax = parse_extent(fname)
+
+    ext =('\t\t\t<xmin>{}</xmin>\n'
+          '\t\t\t<ymin>{}</ymin>\n'
+          '\t\t\t<xmax>{}</xmax>\n'
+          '\t\t\t<ymax>{}</ymax>').format(xmin, ymin, xmax, ymax)
+    return ext
 
 
 def str_swap(str_raw, replace_dict):
@@ -148,7 +182,7 @@ class QGISLayerMaker(object):
                                 "NAME": name,
                                 "EPSG": str(epsg),
                                 "ID": self.str_now,
-                                "LINETYPE":line_type,
+                                "LINE_TYPE":line_type,
                                 "PROVIDER":provider}
 
         elif self.ext == 'tif':
@@ -188,6 +222,9 @@ class QGISLayerMaker(object):
 
         # Assign colors/colormaps
         self.replacements['COLOR'] = self.choose_color_scheme()
+
+        # Retrieve extent
+        self.replacements['EXTENT'] = get_extent_str(path)
 
         # Retrieve the template for a layer
         print("\tUsing layer template {}".format(template))
@@ -360,6 +397,7 @@ def main():
     "ORDER": order,
     "LAYERS": layers,
     "LEGEND": legend,
+    "EXTENT": get_extent_str(args.tifs[0])
     }
     replacements['SPATIAL_REF'] = get_xml_spatial_ref(epsg)
     template_dir = './scripts/qgis_templates'

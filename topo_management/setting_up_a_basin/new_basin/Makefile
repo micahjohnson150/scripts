@@ -95,6 +95,7 @@ topo:
 							-bn $(BASIN_NAME) \
 							-sb delineation/*_subbasin.shp \
 							-dm $(DEM_IMG) \
+							# --extent $(BASIN_EXTENT)
 							-d /Downloads
 
 gis_package:
@@ -124,7 +125,6 @@ qgis:
 																			./delineation/*basin*.shp \
 																			./delineation/streamflow/thresh_$(MIN_THRESH)/net_thresh_*.shp \
 																			-n basin_setup/topo.nc \
-																			# --extent $(BASIN_EXTENT)
 																			-v veg_type dem
 clean_all:
 	rm -rf dem basin_setup delineation

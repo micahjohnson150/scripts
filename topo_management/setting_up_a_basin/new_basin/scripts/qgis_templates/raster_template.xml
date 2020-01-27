@@ -1,9 +1,6 @@
 <maplayer minimumScale="0" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
   <extent>
-    <xmin>318520.40502700000070035</xmin>
-    <ymin>4157522.88733999989926815</ymin>
-    <xmax>329767.72820599999977276</xmax>
-    <ymax>4167937.0754700000397861</ymax>
+[EXTENT]
   </extent>
   <id>[NAME][ID]</id>
   <datasource>[PATH]</datasource>

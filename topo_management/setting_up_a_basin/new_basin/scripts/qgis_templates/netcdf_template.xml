@@ -1,9 +1,6 @@
 <maplayer minimumScale="inf" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
   <extent>
-    <xmin>320004.125</xmin>
-    <ymin>4158330</ymin>
-    <xmax>327754.125</xmax>
-    <ymax>4166680</ymax>
+[EXTENT]
   </extent>
   <id>NETCDF__[NAME]__[VARIABLE][ID]</id>
   <datasource>NETCDF:"[PATH]":[VARIABLE]</datasource>
