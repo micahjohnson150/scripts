@@ -162,6 +162,9 @@ class QGISLayerMaker(object):
         visible = '1'
         checked = 'Checked'
 
+        # Add in the ability to name labels
+        display_name = ''
+
         # Assign a provider and layer_template based on the file ext
         if self.ext == 'shp' or self.ext == 'bna':
             self.ftype = 'shapefile'
@@ -175,22 +178,30 @@ class QGISLayerMaker(object):
             elif 'points' in path:
                 line_type = 'Point'
                 template = join(template_dir, 'points_template.xml')
+
                 # Hide the pour points but still add to the project
                 visible = '0'
                 checked = 'Unchecked'
 
             # Polygon
             else:
+
                 line_type = 'Polygon'
                 template = join(template_dir, 'shapefile_template.xml')
+
+                # Add a label for the project subbasins
+                if 'subbasin' in path:
+                    display_name = name.split('subbasin')[0].replace('_', ' ').title()
+
 
             self.replacements = {"PATH": path,
                                 "NAME": name,
                                 "EPSG": str(epsg),
                                 "ID": self.str_now,
                                 "LINE_TYPE":line_type,
-                                "PROVIDER":provider}
-
+                                "PROVIDER":provider,
+                                "DISPLAY_NAME":display_name}
+                                
         elif self.ext == 'tif':
             self.ftype = 'geotiff'
             ftype = 'geotiff'
