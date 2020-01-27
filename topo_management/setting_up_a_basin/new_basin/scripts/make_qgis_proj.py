@@ -138,14 +138,14 @@ class QGISLayerMaker(object):
         # Template declaration for a layer. Is inserted near the top of project
         self.declaration =(
         '\t\t<layer-tree-layer expanded="0" providerKey="[PROVIDER]" '
-        'checked="Qt::Checked" id="[NAME][ID]" source="[PATH]" name="[NAME]">\n'
+        'checked="Qt::[CHECKED]" id="[NAME][ID]" source="[PATH]" name="[NAME]">\n'
         '\t\t\t<customproperties/>\n'
         '\t\t</layer-tree-layer>\n')
 
         self.legend = (
-        '\t\t<legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="[NAME]" showFeatureCount="0">\n'
+        '\t\t<legendlayer drawingOrder="-1" open="true" checked="Qt::[CHECKED]" name="[NAME]" showFeatureCount="0">\n'
         '\t\t\t\t<filegroup open="true" hidden="false">\n'
-        '\t\t\t\t\t<legendlayerfile isInOverview="0" layerid="[NAME][ID]" visible="1"/>\n'
+        '\t\t\t\t\t<legendlayerfile isInOverview="0" layerid="[NAME][ID]" visible="[VISIBLE]"/>\n'
         '\t\t\t\t</filegroup>\n'
         '\t\t</legendlayer>\n')
 
@@ -158,6 +158,9 @@ class QGISLayerMaker(object):
         # Grab file extension
         self.ext = path.split('.')[-1]
 
+        # Make all layers visible allowing for custom visible layers
+        visible = '1'
+        checked = 'Checked'
 
         # Assign a provider and layer_template based on the file ext
         if self.ext == 'shp' or self.ext == 'bna':
@@ -172,6 +175,9 @@ class QGISLayerMaker(object):
             elif 'points' in path:
                 line_type = 'Point'
                 template = join(template_dir, 'points_template.xml')
+                # Hide the pour points but still add to the project
+                visible = '0'
+                checked = 'Unchecked'
 
             # Polygon
             else:
@@ -205,7 +211,7 @@ class QGISLayerMaker(object):
 
             self.declaration = (
                 '\t\t<layer-tree-layer expanded="0" providerKey="gdal" '
-                'checked="Qt::Checked" id="NETCDF__[NAME]__[VARIABLE][ID]" '
+                'checked="Qt::[CHECKED]" id="NETCDF__[NAME]__[VARIABLE][ID]" '
                 'source="NETCDF:&quot;[PATH]&quot;:[NC_VAR]" name="NETCDF:'
                 '&quot;[NAME]&quot;:[VARIABLE]">\n'
                 '\t\t\t<customproperties/>\n'
@@ -225,6 +231,10 @@ class QGISLayerMaker(object):
 
         # Retrieve extent
         self.replacements['EXTENT'] = get_extent_str(path)
+
+        # Add in visibility
+        self.replacements['VISIBLE'] = visible
+        self.replacements['CHECKED'] = checked
 
         # Retrieve the template for a layer
         print("\tUsing layer template {}".format(template))
