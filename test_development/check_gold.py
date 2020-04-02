@@ -6,29 +6,55 @@ import subprocess as sp
 import sys
 from netCDF4 import Dataset
 from os.path import join, abspath, expanduser
+import os
+import argparse
 
-project = 'awsm'
+__version__ = '0.1.0'
+
+parser = argparse.ArgumentParser(
+description='Checks for differences in gold files and develop files.')
+
+parser.add_argument('dev_dir', metavar='dev_dir', type=str,
+help='Path a directory containing a set of netcdfs that are in development')
+
+parser.add_argument('gold_dir', metavar='gold_dir', type=str,
+help='Path a directory containing a set of netcdfs that are considered gold files')
+
+parser.add_argument('-d', dest='debug', action='store_true',
+help='Whether to clean up files or not')
+args = parser.parse_args()
+
+hdr = 'Gold File Checker v{}'.format(__version__)
+banner = '=' * len(hdr)
+print(banner)
+print(hdr)
+print(banner)
 
 # Location to the gold files and config
-project_dir = abspath(expanduser('~/projects/{}/tests/RME/gold'.format(project)))
+dev_dir = abspath(expanduser(args.dev_dir))
+gold_dir = abspath(expanduser(args.gold_dir))
 
-# Output location where snow and em file lives
-output = join(project_dir, 'output/rme/devel/wy1986/rme_test/runs/run3337_3344')
+# List all the files in the locations, filter on netcdf
 
-for f in ['em.nc','snow.nc']:
-    fname = join(output, f)
-    gfname = join(project_dir, f)
-    diff_f = join(project_dir, 'diff.nc')
+dev_files = os.listdir(dev_dir)
+gold_files = os.listdir(gold_dir)
+
+common_netcdfs = [f for f in dev_files if f in gold_files and f.split('.')[-1]=='nc']
+
+for f in common_netcdfs:
+    fname = join(dev_dir, f)
+    gfname = join(gold_dir, f)
+    diff_f = join(dev_dir, 'diff.nc')
     diff_cmd = 'ncdiff -O {} {} {}'.format(fname, gfname, diff_f)
-    print('\n\n' + diff_cmd)
+    print('Executing:')
+    print('\n' + diff_cmd)
     sp.check_output(diff_cmd, shell=True)
 
-    ds = Dataset(diff_f)
-    print("Opening {}".format(diff_f))
+    cmd = 'nc_stats {}'.format(diff_f)
+    out = sp.check_output(cmd, shell=True)
+    print(out.decode('utf-8'))
 
-    for v in [v for v in ds.variables.keys() if v not in ['x','y','time','projection']]:
-        print("\tEvaluating {}".format(v))
-        cmd = 'nc_stats {} {}'.format(diff_f, v)
-        out = sp.check_output(cmd, shell=True)
-        print(out.decode('utf-8'))
-    ds.close()
+if not args.debug:
+    print('Cleaning up files...')
+    cmd = 'rm {}'.format(diff_f)
+    sp.check_output(cmd, shell = True)
