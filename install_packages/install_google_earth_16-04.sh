@@ -1,3 +1,6 @@
+# https://askubuntu.com/questions/965853/google-earth-doesnt-show-map#
+# Checkout  Yuri Sucupira comments
+
 # Remove an google earth install
 sudo apt remove google-earth-*
 
