@@ -50,7 +50,7 @@ for f in common_netcdfs:
     print('\n' + diff_cmd)
     sp.check_output(diff_cmd, shell=True)
 
-    cmd = 'nc_stats {}'.format(diff_f)
+    cmd = 'nc_stats {} -p 8'.format(diff_f)
     out = sp.check_output(cmd, shell=True)
     print(out.decode('utf-8'))
 

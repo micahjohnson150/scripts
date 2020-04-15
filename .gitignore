@@ -38,3 +38,5 @@
 /topo_management/setting_up_a_basin/new_basin/*.zip
 /topo_management/setting_up_a_basin/new_basin/*.qgs
 /topo_management/setting_up_a_basin/*.zip
+
+**/output
