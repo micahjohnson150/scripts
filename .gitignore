@@ -40,3 +40,4 @@
 /topo_management/setting_up_a_basin/*.zip
 
 **/output
+/repo_management/**/*results/
