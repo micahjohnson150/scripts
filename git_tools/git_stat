@@ -1,0 +1,114 @@
+#!/usr/bin/env python3
+
+from subprocess import check_output
+import os
+import sys
+import argparse
+
+
+def parse_output(s):
+    """
+    parses the output from the command git summary
+    """
+    info = {"authors":{}}
+    s = s.decode("utf-8")
+    author_list = False
+
+    if "not a git repo!" not in s.lower():
+        for line in s.split("\n"):
+             if ":" in line:
+                 k, v = line.split(":")
+                 k = k.strip()
+                 v = v.strip()
+                 k = k.lstrip(" ").rstrip(" ")
+
+                 if k == "commits":
+                    v = int(v)
+
+                 if k == "authors":
+                     author_list = True
+                 else:
+                     info[k] = v
+
+             elif author_list:
+                 line = line.replace("\t"," ")
+                 data = line.split(" ")
+                 data = [d for d in data if d]
+
+                 if data:
+                     info["authors"][" ".join(data[1:-1])] = int(data[0])
+    else:
+        info = False
+
+    return info
+
+def get_user_commit(name):
+    num_projects = 0
+    projects = {}
+    total_c = 0
+    total_uc = 0
+
+    print("\nSearching for {}".format(name))
+    for d in os.listdir("./"):
+        if os.path.isdir(d):
+            num_commits = 0
+
+            try:
+                s = check_output("cd {} && git summary".format(d), shell=True)
+                info = parse_output(s)
+
+                if info != False:
+                    num_projects += 1
+                    for k,v in info.items():
+
+                        if type(v) == dict:
+                            for kk,vv in v.items():
+                                if name in kk.lower():
+                                    num_commits += int(vv)
+
+                        projects[d] = [num_commits, info["commits"]]
+            except:
+                pass
+                        
+    for k,v in projects.items():
+        total_uc += v[0]
+        total_c += v[1]
+
+        # print("\nProject: {}".format(k))
+        #
+        # print("Total Commits = {}".format(v[0]))
+        # print("Contribution = {:0.2f}%".format(v[1]*100.0))
+    print("\nTotal Projects = {}".format(num_projects))
+    print("Total Commits by user = {}".format(total_uc))
+    print("Total Commits = {}".format(total_c))
+
+    return total_uc, total_c
+
+
+def aggregate(info):
+    """
+    given a list of dictionaries representing authors eliminate duplicates
+    """
+    result = []
+
+    for k,v in info["authors"].items():
+        if k.lower():
+            pass
+
+# # Parse command line arguments
+# p = argparse.ArgumentParser(description=' Who does what')
+#
+# p.add_argument(dest='name',
+#                 nargs="+",
+#                 help="name to seek in the projects")
+#
+# args = p.parse_args()
+# name = (" ".join(args.name)).strip()
+users = ["micah johnson",'micah sandusky','mark robertson']
+total = 0
+all_commits = get_user_commit("micah")[-1]
+for n in users:
+    total += get_user_commit(n)[0]
+
+print("Between {} {} commits were made out of {} ({:0.2f}%)"
+"".format(" ".join(users), total, all_commits, 100.0*total/all_commits))
