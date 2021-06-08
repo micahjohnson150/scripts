@@ -21,8 +21,8 @@ import shutil
 
 
 def main():
-    basins = ['don_pedro','sanjoaquin','kings']
-    projects_path = "~/projects/basins"
+    basins = ['tuolumne', 'sanjoaquin']
+    projects_path = "~/projects/m3works/basins"
     output = 'veg_masks'
 
     # Conlidate paths make them absolute
@@ -30,7 +30,7 @@ def main():
     pbasins = [join(projects_path, b) for b in basins]
 
     search_file = 'veg_map.csv'
-    setup_folder = 'model_setup'
+    setup_folder = 'topo'
 
     print("\nGathering veg maps for {}".format(", ".join(basins)))
     df = pd.DataFrame(columns=['VALUE','HEIGHT','CLASSNAME'])

@@ -1,4 +1,3 @@
-from make_all_topos import find_basin_paths
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -11,7 +10,7 @@ import time
 import pandas as pd
 import os
 import shutil
-
+import glob 
 
 if __name__ == "__main__":
     s = time.time()
@@ -19,28 +18,25 @@ if __name__ == "__main__":
     var = sys.argv[1]
 
     # Directory of interest
-    basin_dir = "~/projects/basins"
+    basin_dir = "~/projects/m3works/basins"
     basin_dir = abspath(expanduser(basin_dir))
 
-    out_dir = "~/projects/basins/sierras/analysis/topo_{}_unique".format(var)
+    out_dir = "./topo_{}_unique".format(var)
     out_dir = abspath(expanduser(out_dir))
 
-    basin_paths = find_basin_paths(basin_dir, indicator_folder="basin_setup",
-                                          indicator_file="topo.nc")
-    if os.path.isdir("~/projects/basins/sierras/analysis"):
+    if os.path.isdir("./analysis"):
         shutil.rmtree(out_dir)
-
+    basin_paths = glob.glob(pjoin(basin_dir,'*/topo/basin_setup/topo.nc'))
     out.msg("Making {} histograms for {} topo files..."
             "".format(var, len(basin_paths)))
 
     # Setup a dataframe with var as the index and baisns as the columns
     unique_var_all = []
-    basins = [path_split(r)[-3] for r in basin_paths]
+    basins = [path_split(r)[-4] for r in basin_paths]
     total_cells = 0
     out.msg("Aggregating all unique {} values on {} topos".format(var, len(basin_paths)))
 
-    for r in basin_paths:
-        topo_f = pjoin(r, "topo.nc")
+    for topo_f in basin_paths:
         ds = Dataset(topo_f)
         unique = np.unique(ds.variables[var][:])
         unique_var_all += list(unique)
@@ -54,11 +50,10 @@ if __name__ == "__main__":
     df = pd.DataFrame(columns=basins, index=unique)
     pixels = {}
     
-    for r in basin_paths:
-        out.msg('Working on {}'.format(r))
-        topo_f = pjoin(r, "topo.nc")
+    for topo_f in basin_paths:
+        out.msg('Working on {}'.format(topo_f))
         ds = Dataset(topo_f)
-        basin_name = path_split(r)[-3]
+        basin_name = path_split(topo_f)[-4]
         basin_pixels = shape[0]*shape[1]
         pixels[basin_name] = basin_pixels
         for v in unique:
@@ -73,13 +68,12 @@ if __name__ == "__main__":
     os.mkdir(out_dir)
 
     # Export only the ops basins
-    ops = ["merced","don_pedro","sanjoaquin","kings","kaweah"]
-    df_ops = df[ops].copy()
+    df_ops = df.copy()
     # df_ops = df_ops.div(total_cells)
     #ind = df_ops >= 0.01
     df_ops['total'] = df.sum(axis=1)
     df_ops = df_ops.sort_values(by="total")
-    df_ops[ops].plot(kind='bar',figsize=(10,8), title="Histogram of {} in pixel count".format(var))
+    df_ops.plot(kind='bar',figsize=(10,8), title="Histogram of {} in pixel count".format(var))
 
 
     out.msg("\nPercent of Pixels containing the vegtypes:")

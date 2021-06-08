@@ -38,6 +38,10 @@
 /topo_management/setting_up_a_basin/new_basin/*.zip
 /topo_management/setting_up_a_basin/new_basin/*.qgs
 /topo_management/setting_up_a_basin/*.zip
+/topo_management/radiation_params_report/scripts/veg_map_sierras.csv
+/topo_management/radiation_params_report/scripts/veg_masks/*
+/topo_management/radiation_params_report/topo_veg_type_unique/*
+
 
 **/output
 /repo_management/**/*results/

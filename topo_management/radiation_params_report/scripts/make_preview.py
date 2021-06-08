@@ -19,8 +19,8 @@ def main():
 
     ## INPUTS ##
     output = "veg_k_tau.md"
-    hist_out = "~/projects/basins/sierras/analysis/topo_veg_type_unique/veg_type_histogram.png"
-    pixel_count = "~/projects/basins/sierras/analysis/topo_veg_type_unique/veg_type_count.csv"
+    hist_out = "./topo_veg_type_unique/veg_type_histogram.png"
+    pixel_count = "./topo_veg_type_unique/veg_type_count.csv"
     tau_k_table = "https://user-images.githubusercontent.com/7975741/64275442-c5631500-cf02-11e9-9481-a6a1a0e8ac18.png"
     basin_setup_table = __veg_parameters__
 
