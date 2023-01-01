@@ -45,12 +45,12 @@ class Snotels(Enum):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Plot data at MCS')
+    parser = argparse.ArgumentParser(description='Plot data at Snotel')
     parser.add_argument('station', metavar='station', type=str,
                         help='station to look at', default='Mores Creek Summit')
-    parser.add_argument('--start_date', type=str, default='jan 1 2017',
+    parser.add_argument('--start_date', type=str, default='3 weeks ago',
                         help='Start date for dateparser')
-    parser.add_argument('--end_date', type=str, default='mar 1 2017',
+    parser.add_argument('--end_date', type=str, default='today',
                         help='End date for dateparser')
     args = parser.parse_args()
     sntl = Snotels.from_name(args.station)
@@ -101,7 +101,7 @@ def main():
 
     # Plot rain on snow events
     y2 = ax.get_ylim()[1]
-    ind = (df['AIR TEMP'] > 35) & (df['PRECIPITATON'] > 0.2) & (df['SWE'] > 5)
+    ind = (df['AIR TEMP'] > 35) & (df['PRECIPITATON'] > 0.2) & (df['SWE'] > 2)
     delta = df.index[1] - df.index[0]
 
     ax.fill_between(df.index, df[depth_name] + 3, y2*1.1, facecolor="lightskyblue", hatch="..", edgecolor="k",
