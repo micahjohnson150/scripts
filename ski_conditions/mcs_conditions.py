@@ -8,14 +8,18 @@ import matplotlib.pyplot as plt
 from matplotlib.cm import jet
 from matplotlib.colors import Normalize
 from matplotlib.colorbar import ColorbarBase
-from metloom.pointdata import SnotelPointData
+from metloom.pointdata import SnotelPointData, CDECPointData
 from enum import Enum
 
 
-class Snotels(Enum):
-    CSSL = "428:CA:SNTL", "CSSL"
-    MCS = "637:ID:SNTL", "Mores Creek Summit"
-    BNR = "312:ID:SNTL", "Banner Summit"
+class Stations(Enum):
+    CSSL = "428:CA:SNTL", "CSSL", SnotelPointData
+    MCS = "637:ID:SNTL", "Mores Creek Summit", SnotelPointData
+    BNR = "312:ID:SNTL", "Banner Summit", SnotelPointData
+    TUM = 'TUM', "Tuolumne Meadows", CDECPointData
+    GIN = 'GIN', "Gin Flat", CDECPointData
+    KIB = 'KIB', "Lower Kibbie", CDECPointData
+    WHW = 'WHW', "White Wolf", CDECPointData
 
     @property
     def name(self):
@@ -23,6 +27,9 @@ class Snotels(Enum):
     @property
     def code(self):
         return self.value[0]
+    @property
+    def network_class(self):
+        return self.value[2]
     @classmethod
     def from_name(cls, name):
         result = None
@@ -44,32 +51,7 @@ class Snotels(Enum):
         return result
 
 
-def main():
-    parser = argparse.ArgumentParser(description='Plot data at Snotel')
-    parser.add_argument('station', metavar='station', type=str,
-                        help='station to look at', default='Mores Creek Summit')
-    parser.add_argument('--start_date', type=str, default='3 weeks ago',
-                        help='Start date for dateparser')
-    parser.add_argument('--end_date', type=str, default='today',
-                        help='End date for dateparser')
-    args = parser.parse_args()
-    sntl = Snotels.from_name(args.station)
-    if sntl is not None:
-        snotel_point = SnotelPointData(sntl.code, sntl.name)
-    else:
-        snotel_point = SnotelPointData(args.station, args.station)
-
-    variables = [snotel_point.ALLOWED_VARIABLES.SWE, snotel_point.ALLOWED_VARIABLES.PRECIPITATION,
-                 snotel_point.ALLOWED_VARIABLES.TEMP, snotel_point.ALLOWED_VARIABLES.SNOWDEPTH]
-
-    depth_name = 'SNOWDEPTH'
-
-    start = dateparser.parse(args.start_date).date()
-    end = dateparser.parse(args.end_date).date()
-    print(f"Pulling data for {snotel_point.name} between {start} to {end}")
-    df = snotel_point.get_daily_data(start, end, variables)
-
-
+def plot_station(df, depth_name='SNOWDEPTH'):
     # Plot the snow depth
     df = df.reset_index().set_index('datetime')
     fig, ax = plt.subplots(1)
@@ -101,15 +83,44 @@ def main():
 
     # Plot rain on snow events
     y2 = ax.get_ylim()[1]
-    ind = (df['AIR TEMP'] > 35) & (df['PRECIPITATON'] > 0.2) & (df['SWE'] > 2)
+    ind = (df['AIR TEMP'] > 35) & (df['PRECIPITATION'] > 0.2) & (df['SWE'] > 2)
     delta = df.index[1] - df.index[0]
 
     ax.fill_between(df.index, df[depth_name] + 3, y2*1.1, facecolor="lightskyblue", hatch="..", edgecolor="k",
                     linewidth=0.0, where=ind, interpolate=False)
-    ax.set_title(f"{snotel_point.name.title()} ({snotel_point.metadata.z} ft)")
     ax.set_ylim(0, y2)
+    return ax
 
+
+def main():
+    parser = argparse.ArgumentParser(description='Plot data at Snotel')
+    parser.add_argument('station', metavar='station', type=str,
+                        help='station to look at', default='Mores Creek Summit')
+    parser.add_argument('--start_date', type=str, default='3 weeks ago',
+                        help='Start date for dateparser')
+    parser.add_argument('--end_date', type=str, default='yesterday',
+                        help='End date for dateparser')
+    args = parser.parse_args()
+    stn = Stations.from_name(args.station)
+    Point_Class = stn.network_class
+
+    if stn is not None:
+        station_point = Point_Class(stn.code, stn.name)
+    else:
+        station_point = Point_Class(args.station, args.station)
+
+    variables = [station_point.ALLOWED_VARIABLES.SWE, station_point.ALLOWED_VARIABLES.PRECIPITATION,
+                 station_point.ALLOWED_VARIABLES.TEMP, station_point.ALLOWED_VARIABLES.SNOWDEPTH]
+
+    start = dateparser.parse(args.start_date).date()
+    end = dateparser.parse(args.end_date).date()
+    print(f"Pulling data for {station_point.name} between {start} to {end}")
+    df = station_point.get_daily_data(start, end, variables)
+
+    ax = plot_station(df)
+    ax.set_title(f"{station_point.name.title()} ({station_point.metadata.z} ft)")
     plt.show()
+
 
 
 if __name__ == '__main__':
